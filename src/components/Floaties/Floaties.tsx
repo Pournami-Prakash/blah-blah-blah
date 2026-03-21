@@ -276,14 +276,17 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
         const t = TIER[f.tier];
         const isMobile = vw < 768;
 
-        // On mobile, right-side floaties render 1.5x bigger so they match
-        // the visual weight of the left-side full-body characters.
-        const sizeBoost = 3;
-        const scaledW = Math.round(f.w * t.scale * sizeBoost);
-        const scaledH = Math.round(f.h * t.scale * sizeBoost);
+        const scaledW = Math.round(f.w * t.scale);
+        const scaledH = Math.round(f.h * t.scale);
 
         const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
-        const leftValue = `${f.pos.x * 100}%`;
+
+        // On mobile the right-column SVGs (typewriter, laptop, duck-letter) have their
+        // artwork on the RIGHT side of the viewBox. At x:0.87 that artwork is off-screen.
+        // Pull them to x:0.72 so the right portion of the SVG enters the viewport.
+        const leftValue = (isMobile && f.pos.x > 0.83)
+          ? '72%'
+          : `${f.pos.x * 100}%`;
 
         return (
           <div
