@@ -163,8 +163,7 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
               <img
                 src={f.src}
                 width={w}
-                height={h}
-                style={{ display: 'block' }}
+                style={{ display: 'block', height: 'auto' }}
                 alt={f.label}
               />
             </div>
