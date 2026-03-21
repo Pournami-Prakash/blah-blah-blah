@@ -1,0 +1,204 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Global interaction feel ─────────────────────────────────────────────────
+   Emil Kowalski style: fast compress on press, springy bounce on release.
+   The two-phase transition is the key — quick in, slow bouncy out.
+   Disabled buttons and inputs are excluded.
+ ────────────────────────────────────────────────────────────────────────── */
+button:not(:disabled), [role="button"]:not(:disabled) {
+  /* Bouncy spring-back on release */
+  transition:
+    transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.22s ease,
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    opacity 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+button:not(:disabled):active, [role="button"]:not(:disabled):active {
+  /* Fast compress on press */
+  transform: scale(0.95) translateY(1px) !important;
+  transition-duration: 0.08s !important;
+  transition-timing-function: ease !important;
+}
+
+/* Focus rings that aren't ugly */
+button:focus-visible {
+  outline: 2px solid rgba(232,84,58,0.55);
+  outline-offset: 3px;
+  border-radius: 8px;
+}
+
+/* Inputs feel snappy on focus */
+input, textarea {
+  transition: border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+/* Smooth scrolling everywhere */
+html { scroll-behavior: smooth; }
+
+/* Remove number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+:root {
+  /* ── Palette ─────────────────────────────────────────────────────────
+     One warm linen for all light pages; intentionally darker for wall.
+     Every page background derives from these two tokens only.
+  ──────────────────────────────────────────────────────────────────── */
+  --bg:         #F4EFE8;   /* home, journal, modals — warm linen       */
+  --bg-wall:    #E9E3D6;   /* wall — cork board, intentionally darker   */
+  --bg-sheet:   #F7F3EC;   /* journal page paper                        */
+  --bg-sheet-r: #F2EDE5;   /* right journal page — just a touch darker  */
+
+  --dark:     #0F0D0B;
+  --coral:    #E8543A;
+  --amber:    #EDB846;
+  --sage:     #5D9A70;
+  --periwink: #7090C8;
+  --muted:    #9A8A7A;
+  --border:   #E2D9CE;
+  --input-bg: #EDE8DF;
+}
+
+body {
+  background: var(--bg);
+  font-family: 'DM Sans', sans-serif;
+  color: var(--dark);
+  overflow-x: hidden;
+  /* Single grain texture for warmth — one rule, everywhere */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.032'/%3E%3C/svg%3E");
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D8D0C4; border-radius: 2px; }
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.15; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ── Floatie drift animations — X+Y sway for organic suspended feel ── */
+@keyframes drift1 {
+  0%   { transform: translate(0px,    0px)   rotate(0deg);    }
+  20%  { transform: translate(3px,  -10px)   rotate(1.2deg);  }
+  45%  { transform: translate(-2px,  -6px)   rotate(-0.5deg); }
+  70%  { transform: translate(4px,   -4px)   rotate(0.8deg);  }
+  100% { transform: translate(0px,    0px)   rotate(0deg);    }
+}
+@keyframes drift2 {
+  0%   { transform: translate(0px,   0px)   rotate(0deg);    }
+  30%  { transform: translate(-4px, -7px)   rotate(-1deg);   }
+  55%  { transform: translate(2px,  -3px)   rotate(0.5deg);  }
+  80%  { transform: translate(-1px, -5px)   rotate(-0.3deg); }
+  100% { transform: translate(0px,   0px)   rotate(0deg);    }
+}
+@keyframes drift3 {
+  0%   { transform: translate(0px,    0px)   rotate(0deg);    }
+  18%  { transform: translate(5px,  -12px)   rotate(1.5deg);  }
+  50%  { transform: translate(-3px,  -7px)   rotate(-0.6deg); }
+  78%  { transform: translate(2px,   -3px)   rotate(0.9deg);  }
+  100% { transform: translate(0px,    0px)   rotate(0deg);    }
+}
+@keyframes drift4 {
+  0%   { transform: translate(0px,   0px)   rotate(0deg);    }
+  35%  { transform: translate(-3px, -8px)   rotate(-1.2deg); }
+  60%  { transform: translate(4px,  -2px)   rotate(0.4deg);  }
+  82%  { transform: translate(-2px, -5px)   rotate(-0.7deg); }
+  100% { transform: translate(0px,   0px)   rotate(0deg);    }
+}
+@keyframes drift5 {
+  0%   { transform: translate(0px,    0px)   rotate(0deg);    }
+  28%  { transform: translate(4px,  -11px)   rotate(0.9deg);  }
+  52%  { transform: translate(-3px,  -6px)   rotate(-0.5deg); }
+  76%  { transform: translate(2px,   -8px)   rotate(0.6deg);  }
+  100% { transform: translate(0px,    0px)   rotate(0deg);    }
+}
+@keyframes drift6 {
+  0%   { transform: translate(0px,   0px)   rotate(0deg);    }
+  40%  { transform: translate(-5px, -6px)   rotate(-0.7deg); }
+  65%  { transform: translate(3px,  -1px)   rotate(0.3deg);  }
+  85%  { transform: translate(-2px, -4px)   rotate(-0.4deg); }
+  100% { transform: translate(0px,   0px)   rotate(0deg);    }
+}
+
+/* ── Entrance pop — scale+opacity only, NO translate (parallax lives on parent) ── */
+@keyframes popIn {
+  0%   { opacity: 0; transform: scale(0.45) rotate(-8deg); }
+  55%  { opacity: 1; transform: scale(1.07) rotate(2deg);  }
+  75%  { transform: scale(0.97) rotate(-0.5deg); }
+  100% { opacity: 1; transform: scale(1)    rotate(0deg);  }
+}
+
+@keyframes spark {
+  0%, 100% { opacity: 0.45; transform: scale(1); }
+  50%       { opacity: 0.85; transform: scale(1.5); }
+}
+
+/* ── Globe orbit ring — slow pulse ── */
+@keyframes orbitPulse {
+  0%, 100% { opacity: 0.18; transform: scale(1)    rotate(0deg);   }
+  50%      { opacity: 0.32; transform: scale(1.012) rotate(180deg); }
+}
+
+/* ── CTA button — coral heartbeat ── */
+@keyframes ctaBreathe {
+  0%, 100% { box-shadow: 0 4px 20px rgba(232,84,58,0.25); }
+  50%      { box-shadow: 0 8px 32px rgba(232,84,58,0.45), 0 0 0 5px rgba(232,84,58,0.12); }
+}
+
+/* ── Background aurora — slow colour wash ── */
+@keyframes aurora {
+  0%   { opacity: 0.60; transform: scale(1)    translateY(0px)  translateX(0px); }
+  30%  { opacity: 0.80; transform: scale(1.05) translateY(-10px) translateX(6px); }
+  60%  { opacity: 0.68; transform: scale(1.02) translateY(5px)  translateX(-4px); }
+  100% { opacity: 0.60; transform: scale(1)    translateY(0px)  translateX(0px); }
+}
+
+/* ── Floatie click ripple ── */
+@keyframes ripple {
+  0%   { transform: translate(-50%,-50%) scale(0); opacity: 0.5; }
+  100% { transform: translate(-50%,-50%) scale(2.8); opacity: 0; }
+}
+
+/* ── Globe floating shadow pulse ── */
+@keyframes shadowPulse {
+  0%, 100% { opacity: 0.7; transform: translateX(-50%) scaleX(1);   }
+  50%       { opacity: 1.0; transform: translateX(-50%) scaleX(0.88); }
+}
+
+/* Journal paper lines */
+.journal-lines {
+  background-image: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 23px,
+    #E8E0D4 23px,
+    #E8E0D4 24px
+  );
+  background-position: 0 24px;
+}
+
+/* Polaroid rotation */
+.polaroid-rotate-1 { transform: rotate(-2.5deg); }
+.polaroid-rotate-2 { transform: rotate(1.8deg); }
+.polaroid-rotate-3 { transform: rotate(-1.2deg); }
+.polaroid-rotate-4 { transform: rotate(2.1deg); }
+.polaroid-rotate-5 { transform: rotate(-0.8deg); }

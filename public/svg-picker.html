@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SVG Picker — blah blah blah</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #F8F6F2; font-family: 'DM Sans', sans-serif; padding: 28px 32px 100px; }
+h1 { font-family: Georgia, serif; font-size: 20px; color: #0F0D0B; margin-bottom: 4px; }
+.sub { font-size: 12px; color: #9A8A7A; margin-bottom: 24px; font-family: monospace; }
+.section-label {
+  font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #9A8A7A; margin: 24px 0 10px; font-family: monospace;
+  border-bottom: 1px solid #E5DDD4; padding-bottom: 6px;
+}
+.grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 10px; }
+.cell {
+  background: #fff; border: 2px solid #E5DDD4; border-radius: 12px;
+  padding: 12px 8px 8px; text-align: center; cursor: pointer;
+  transition: border-color .18s, box-shadow .18s, transform .14s;
+  position: relative; user-select: none;
+}
+.cell:hover { border-color: #E8543A; box-shadow: 0 4px 16px rgba(232,84,58,.15); transform: translateY(-2px); }
+.cell.sel { border-color: #E8543A; background: #FFF4F2; box-shadow: 0 4px 18px rgba(232,84,58,.22); }
+.cell.sel::after {
+  content: '✓'; position: absolute; top: 5px; right: 7px;
+  color: #E8543A; font-size: 13px; font-weight: 700;
+}
+.cell img { width: 88px; height: 88px; object-fit: contain; mix-blend-mode: multiply; display: block; margin: 0 auto 6px; }
+.num { font-size: 10px; color: #9A8A7A; font-family: monospace; }
+.cell:hover .num { color: #E8543A; }
+.cell.sel .num { color: #E8543A; font-weight: 600; }
+.picked-bar {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: #fff; border-top: 2px solid #E5DDD4; padding: 14px 32px;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.08);
+  display: flex; align-items: center; gap: 16px; z-index: 100;
+}
+.picked-bar strong { font-size: 12px; color: #E8543A; font-family: monospace; white-space: nowrap; }
+#picks { font-size: 13px; color: #0F0D0B; font-family: monospace; flex: 1; }
+.count { font-size: 11px; color: #9A8A7A; font-family: monospace; white-space: nowrap; }
+</style>
+</head>
+<body>
+<h1>pick your floaties</h1>
+<p class="sub">click to select · choose up to 10 · copy your picks from the bar below and tell me</p>
+
+<p class="section-label">original SVGs (1 – 34)</p>
+<div class="grid">
+  <div class="cell" onclick="toggle(this,'1')" id="c1"><img src="/svgs/1.svg" onerror="this.style.opacity=0.15"><div class="num">1</div></div>
+  <div class="cell" onclick="toggle(this,'2')" id="c2"><img src="/svgs/2.svg" onerror="this.style.opacity=0.15"><div class="num">2</div></div>
+  <div class="cell" onclick="toggle(this,'3')" id="c3"><img src="/svgs/3.svg" onerror="this.style.opacity=0.15"><div class="num">3</div></div>
+  <div class="cell" onclick="toggle(this,'4')" id="c4"><img src="/svgs/4.svg" onerror="this.style.opacity=0.15"><div class="num">4</div></div>
+  <div class="cell" onclick="toggle(this,'5')" id="c5"><img src="/svgs/5.svg" onerror="this.style.opacity=0.15"><div class="num">5</div></div>
+  <div class="cell" onclick="toggle(this,'6')" id="c6"><img src="/svgs/6.svg" onerror="this.style.opacity=0.15"><div class="num">6</div></div>
+  <div class="cell" onclick="toggle(this,'7')" id="c7"><img src="/svgs/7.svg" onerror="this.style.opacity=0.15"><div class="num">7</div></div>
+  <div class="cell" onclick="toggle(this,'8')" id="c8"><img src="/svgs/8.svg" onerror="this.style.opacity=0.15"><div class="num">8</div></div>
+  <div class="cell" onclick="toggle(this,'9')" id="c9"><img src="/svgs/9.svg" onerror="this.style.opacity=0.15"><div class="num">9</div></div>
+  <div class="cell" onclick="toggle(this,'10')" id="c10"><img src="/svgs/10.svg" onerror="this.style.opacity=0.15"><div class="num">10</div></div>
+  <div class="cell" onclick="toggle(this,'11')" id="c11"><img src="/svgs/11.svg" onerror="this.style.opacity=0.15"><div class="num">11</div></div>
+  <div class="cell" onclick="toggle(this,'12')" id="c12"><img src="/svgs/12.svg" onerror="this.style.opacity=0.15"><div class="num">12</div></div>
+  <div class="cell" onclick="toggle(this,'13')" id="c13"><img src="/svgs/13.svg" onerror="this.style.opacity=0.15"><div class="num">13</div></div>
+  <div class="cell" onclick="toggle(this,'14')" id="c14"><img src="/svgs/14.svg" onerror="this.style.opacity=0.15"><div class="num">14</div></div>
+  <div class="cell" onclick="toggle(this,'15')" id="c15"><img src="/svgs/15.svg" onerror="this.style.opacity=0.15"><div class="num">15</div></div>
+  <div class="cell" onclick="toggle(this,'16')" id="c16"><img src="/svgs/16.svg" onerror="this.style.opacity=0.15"><div class="num">16</div></div>
+  <div class="cell" onclick="toggle(this,'17')" id="c17"><img src="/svgs/17.svg" onerror="this.style.opacity=0.15"><div class="num">17</div></div>
+  <div class="cell" onclick="toggle(this,'18')" id="c18"><img src="/svgs/18.svg" onerror="this.style.opacity=0.15"><div class="num">18</div></div>
+  <div class="cell" onclick="toggle(this,'19')" id="c19"><img src="/svgs/19.svg" onerror="this.style.opacity=0.15"><div class="num">19</div></div>
+  <div class="cell" onclick="toggle(this,'20')" id="c20"><img src="/svgs/20.svg" onerror="this.style.opacity=0.15"><div class="num">20</div></div>
+  <div class="cell" onclick="toggle(this,'21')" id="c21"><img src="/svgs/21.svg" onerror="this.style.opacity=0.15"><div class="num">21</div></div>
+  <div class="cell" onclick="toggle(this,'22')" id="c22"><img src="/svgs/22.svg" onerror="this.style.opacity=0.15"><div class="num">22</div></div>
+  <div class="cell" onclick="toggle(this,'23')" id="c23"><img src="/svgs/23.svg" onerror="this.style.opacity=0.15"><div class="num">23</div></div>
+  <div class="cell" onclick="toggle(this,'24')" id="c24"><img src="/svgs/24.svg" onerror="this.style.opacity=0.15"><div class="num">24</div></div>
+  <div class="cell" onclick="toggle(this,'25')" id="c25"><img src="/svgs/25.svg" onerror="this.style.opacity=0.15"><div class="num">25</div></div>
+  <div class="cell" onclick="toggle(this,'26')" id="c26"><img src="/svgs/26.svg" onerror="this.style.opacity=0.15"><div class="num">26</div></div>
+  <div class="cell" onclick="toggle(this,'27')" id="c27"><img src="/svgs/27.svg" onerror="this.style.opacity=0.15"><div class="num">27</div></div>
+  <div class="cell" onclick="toggle(this,'28')" id="c28"><img src="/svgs/28.svg" onerror="this.style.opacity=0.15"><div class="num">28</div></div>
+  <div class="cell" onclick="toggle(this,'29')" id="c29"><img src="/svgs/29.svg" onerror="this.style.opacity=0.15"><div class="num">29</div></div>
+  <div class="cell" onclick="toggle(this,'30')" id="c30"><img src="/svgs/30.svg" onerror="this.style.opacity=0.15"><div class="num">30</div></div>
+  <div class="cell" onclick="toggle(this,'31')" id="c31"><img src="/svgs/31.svg" onerror="this.style.opacity=0.15"><div class="num">31</div></div>
+  <div class="cell" onclick="toggle(this,'32')" id="c32"><img src="/svgs/32.svg" onerror="this.style.opacity=0.15"><div class="num">32</div></div>
+  <div class="cell" onclick="toggle(this,'33')" id="c33"><img src="/svgs/33.svg" onerror="this.style.opacity=0.15"><div class="num">33</div></div>
+  <div class="cell" onclick="toggle(this,'34')" id="c34"><img src="/svgs/34.svg" onerror="this.style.opacity=0.15"><div class="num">34</div></div>
+</div>
+
+<p class="section-label">lottie animations → converted to SVG</p>
+<div class="grid">
+  <div class="cell" onclick="toggle(this,'lottie_35')" id="clottie_35"><img src="/svgs/lottie_35.svg"><div class="num">cat-love</div></div>
+  <div class="cell" onclick="toggle(this,'lottie_36')" id="clottie_36"><img src="/svgs/lottie_36.svg"><div class="num">idea</div></div>
+  <div class="cell" onclick="toggle(this,'lottie_37')" id="clottie_37"><img src="/svgs/lottie_37.svg"><div class="num">mental-wbg</div></div>
+  <div class="cell" onclick="toggle(this,'lottie_38')" id="clottie_38"><img src="/svgs/lottie_38.svg"><div class="num">msg-sent</div></div>
+  <div class="cell" onclick="toggle(this,'lottie_39')" id="clottie_39"><img src="/svgs/lottie_39.svg"><div class="num">polaroid</div></div>
+  <div class="cell" onclick="toggle(this,'lottie_40')" id="clottie_40"><img src="/svgs/lottie_40.svg"><div class="num">restaurant</div></div>
+  <div class="cell" onclick="toggle(this,'lottie_41')" id="clottie_41"><img src="/svgs/lottie_41.svg"><div class="num">roadtrip</div></div>
+  <div class="cell" onclick="toggle(this,'lottie_42')" id="clottie_42"><img src="/svgs/lottie_42.svg"><div class="num">tv</div></div>
+  <div class="cell" onclick="toggle(this,'lottie_43')" id="clottie_43"><img src="/svgs/lottie_43.svg"><div class="num">writing</div></div>
+</div>
+
+<p class="section-label">character illustrations</p>
+<div class="grid">
+  <div class="cell" onclick="toggle(this,'char_bird')" id="cchar_bird"><img src="/svgs/char_bird.png"><div class="num">bird</div></div>
+  <div class="cell" onclick="toggle(this,'char_duck')" id="cchar_duck"><img src="/svgs/char_duck.png"><div class="num">duck</div></div>
+  <div class="cell" onclick="toggle(this,'char_ostrich')" id="cchar_ostrich"><img src="/svgs/char_ostrich.png"><div class="num">ostrich</div></div>
+  <div class="cell" onclick="toggle(this,'char_plane')" id="cchar_plane"><img src="/svgs/char_plane.png"><div class="num">plane</div></div>
+</div>
+
+<div class="picked-bar">
+  <strong>selected:</strong>
+  <div id="picks">none yet — click above to choose</div>
+  <div class="count" id="cnt">0 / 10</div>
+</div>
+
+<script>
+const sel = new Set();
+function toggle(el, id) {
+  if (sel.has(id)) { sel.delete(id); el.classList.remove('sel'); }
+  else { sel.add(id); el.classList.add('sel'); }
+  const s = [...sel].sort((a,b) => {
+    const na = parseInt(a), nb = parseInt(b);
+    if (!isNaN(na) && !isNaN(nb)) return na - nb;
+    return a.localeCompare(b);
+  });
+  document.getElementById('picks').textContent = s.length ? s.join('  ·  ') : 'none yet — click above to choose';
+  document.getElementById('cnt').textContent = s.length + ' / 10';
+}
+</script>
+</body>
+</html>
