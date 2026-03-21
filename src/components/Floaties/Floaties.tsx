@@ -273,18 +273,18 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
       {FLOATIES.map((f, i) => {
         const t = TIER[f.tier];
         const isMobile = vw < 768;
-        // Scale images down on mobile so they fit without overwhelming the layout
-        const mobileScale = isMobile ? 0.72 : 1;
-        const scaledW = Math.round(f.w * t.scale * mobileScale);
-        const scaledH = Math.round(f.h * t.scale * mobileScale);
+        const scaledW = Math.round(f.w * t.scale);
+        const scaledH = Math.round(f.h * t.scale);
 
         // Apply verticalOffset as a pixel shift on top of the percentage-based position
         const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
 
-        // On mobile: left-side floaties stay at their natural % (they peek in nicely from the left edge).
-        // Right-side floaties (x > 0.6) get pixel-clamped so they're not hidden off the right edge.
-        const leftValue = isMobile && f.pos.x > 0.6
-          ? `${Math.min(f.pos.x * vw, vw - scaledW * 0.4)}px`
+        // On mobile, mirror the right column to match left column overflow.
+        // Left column sits at x:0.09 → peeks ~80px in from left edge.
+        // Right column mirror: 1 - 0.09 = 0.91, so same ~80px peeks in from right.
+        // Only applies to the right column (x > 0.83). Top-right (x:0.78) is already symmetric.
+        const leftValue = isMobile && f.pos.x > 0.83
+          ? '91%'
           : `${f.pos.x * 100}%`;
 
         return (
