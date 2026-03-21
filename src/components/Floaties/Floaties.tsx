@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import type { ModalType } from '../../hooks/useModal';
 
 interface FloatiesProps {
@@ -102,7 +103,7 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
     };
   }, []);
 
-  return (
+  return createPortal(
     <>
       {FLOATIES.map((f, i) => {
         const isMobile = vw < 768;
@@ -153,6 +154,7 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
           </div>
         );
       })}
-    </>
+    </>,
+    document.body
   );
 }
