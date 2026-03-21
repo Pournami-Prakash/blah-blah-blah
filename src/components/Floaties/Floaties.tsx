@@ -30,7 +30,7 @@ const FLOATIES: Floatie[] = [
   { id: 'snap',      label: 'quick snap',         modal: 'polaroid',   pos: { x: 0.09, y: 0.52 }, drift: 'drift3', period: '7.6s', delay: '0.4s', depth: 0.42, src: '/svgs/polaroid.svg',                 w: W, h: H, tilt:  2 },
   { id: 'movies',    label: 'watched something',  modal: 'movie',      pos: { x: 0.10, y: 0.76 }, drift: 'drift5', period: '8.2s', delay: '0.9s', depth: 0.38, src: '/svgs/Duck%20TV.svg',                 w: W, h: H, tilt:  3 },
   { id: 'food',      label: 'food & places',      modal: 'cafe',       pos: { x: 0.22, y: 0.11 }, drift: 'drift5', period: '5.9s', delay: '0s',   depth: 0.45, src: '/svgs/eating.svg',                    w: W, h: H, tilt: -3 },
-  { id: 'activities',label: 'activities',          modal: 'activity',   pos: { x: 0.78, y: 0.11 }, drift: 'drift6', period: '6.3s', delay: '0.2s', depth: 0.60, src: '/svgs/travel.svg',                    w: 360, h: 202, tilt:  2 },
+  { id: 'activities',label: 'activities',          modal: 'activity',   pos: { x: 0.78, y: 0.11 }, drift: 'drift6', period: '6.3s', delay: '0.2s', depth: 0.60, src: '/svgs/travel.svg',                    w: 360, h: 356, tilt:  2 },
   { id: 'journal',   label: 'journal',             modal: 'journal',    pos: { x: 0.87, y: 0.28 }, drift: 'drift3', period: '7.2s', delay: '0.4s', depth: 0.55, src: '/svgs/typewriter.svg',                w: 360, h: 322, tilt:  3, offsetX: -30 },
   { id: 'random',    label: 'thoughts',            modal: 'typewriter', pos: { x: 0.87, y: 0.52 }, drift: 'drift2', period: '6.1s', delay: '0.5s', depth: 0.50, src: '/svgs/typing.svg',                    w: 360, h: 331, tilt: -2, offsetX: -25 },
   { id: 'sendNote',  label: 'note',                modal: 'letter',     pos: { x: 0.87, y: 0.76 }, drift: 'drift4', period: '6.9s', delay: '0.8s', depth: 0.65, src: '/svgs/duck%20letter.svg',             w: 360, h: 202, tilt:  4, offsetX: -20 },
@@ -156,7 +156,6 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
                 height={h}
                 style={{
                   display: 'block',
-                  mixBlendMode: 'multiply',
                   userSelect: 'none',
                 }}
                 alt={f.label}
