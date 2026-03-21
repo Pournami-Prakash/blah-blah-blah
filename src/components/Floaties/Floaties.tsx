@@ -276,19 +276,13 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
         const t = TIER[f.tier];
         const isMobile = vw < 768;
 
-        const scaledW = Math.round(f.w * t.scale);
-        const scaledH = Math.round(f.h * t.scale);
+        // On mobile, right-side floaties render 1.5x bigger so they match
+        // the visual weight of the left-side full-body characters.
+        const sizeBoost = (isMobile && f.pos.x > 0.5) ? 1.5 : 1;
+        const scaledW = Math.round(f.w * t.scale * sizeBoost);
+        const scaledH = Math.round(f.h * t.scale * sizeBoost);
 
         const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
-
-        // On mobile, stop centering near edges — anchor right-side floaties from their
-        // left edge so they don't get pulled off-screen by translate(-50%).
-        const anchorTransform = isMobile
-          ? f.pos.x >= 0.5
-            ? 'translate(0%, -50%)'    // right side: anchor left edge, stays visible
-            : 'translate(-20%, -50%)'  // left side: slight pull, mostly anchored
-          : undefined; // desktop: CSS class handles translate(-50%, -50%)
-
         const leftValue = `${f.pos.x * 100}%`;
 
         return (
@@ -298,7 +292,6 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
             style={{
               left: leftValue,
               top: topValue,
-              ...(anchorTransform ? { transform: anchorTransform } : {}),
             }}
           >
             <div
