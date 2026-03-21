@@ -223,7 +223,7 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
         .floatie-inner img {
           transition: transform 0.42s cubic-bezier(.34,1.56,.64,1);
           display: block;
-          mix-blend-mode: multiply;
+
         }
 
         .floatie-px:active .floatie-inner img {
