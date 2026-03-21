@@ -8,19 +8,20 @@ interface FloatiesProps {
 }
 
 interface Floatie {
-  id:     string;
-  label:  string;
-  modal:  ModalType;
-  pos:    { x: number; y: number };
-  drift:  string;
-  period: string;
-  delay:  string;
-  depth:  number;
-  src:    string;
-  w:      number;
-  h:      number;
-  tier:   1 | 2 | 3;
-  tilt:   number;
+  id:      string;
+  label:   string;
+  modal:   ModalType;
+  pos:     { x: number; y: number };
+  drift:   string;
+  period:  string;
+  delay:   string;
+  depth:   number;
+  src:     string;
+  w:       number;
+  h:       number;
+  tier:    1 | 2 | 3;
+  tilt:    number;
+  offsetX?: number; // px correction for SVG artwork not centered in viewBox
 }
 
 const TIER: Record<1|2|3, { scale: number; opacity: number; blur: string; shadow: string }> = {
@@ -88,7 +89,7 @@ const FLOATIES: Floatie[] = [
     pos: { x: 0.87, y: 0.28 },
     drift: 'drift3', period: '7.2s', delay: '0.4s', depth: 0.55,
     src: '/svgs/typewriter.svg', w: W, h: H,
-    tier: 2, tilt: 3,
+    tier: 2, tilt: 3, offsetX: -30,
   },
   {
     id: 'random',
@@ -97,7 +98,7 @@ const FLOATIES: Floatie[] = [
     pos: { x: 0.87, y: 0.52 },
     drift: 'drift2', period: '6.1s', delay: '0.5s', depth: 0.50,
     src: '/svgs/typing.svg', w: 310, h: 175,
-    tier: 1, tilt: -2,
+    tier: 1, tilt: -2, offsetX: -25,
   },
   {
     id: 'sendNote',
@@ -106,7 +107,7 @@ const FLOATIES: Floatie[] = [
     pos: { x: 0.87, y: 0.76 },
     drift: 'drift4', period: '6.9s', delay: '0.8s', depth: 0.65,
     src: '/svgs/duck%20letter.svg', w: W, h: H,
-    tier: 2, tilt: 4,
+    tier: 2, tilt: 4, offsetX: -20,
   },
 ];
 
@@ -172,7 +173,8 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
           ty += (dy / dist) * pull * MAGNET_MAX;
         }
 
-        el.style.transform = `translate(${tx.toFixed(2)}px, ${ty.toFixed(2)}px)`;
+        const ox = f.offsetX || 0;
+        el.style.transform = `translate(${(tx + ox).toFixed(2)}px, ${ty.toFixed(2)}px)`;
       });
 
       rafRef.current = requestAnimationFrame(loop);
@@ -274,12 +276,8 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
         const t = TIER[f.tier];
         const isMobile = vw < 768;
 
-        // Right-column SVGs (typewriter, laptop, duck-letter) are visually smaller objects
-        // than the full-body characters on the left. Boost their render size on mobile so
-        // they feel equally prominent. Left column stays at natural tier scale.
-        const sizeBoost = isMobile && f.pos.x > 0.83 ? 1.35 : 1;
-        const scaledW = Math.round(f.w * t.scale * sizeBoost);
-        const scaledH = Math.round(f.h * t.scale * sizeBoost);
+        const scaledW = Math.round(f.w * t.scale);
+        const scaledH = Math.round(f.h * t.scale);
 
         const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
 
