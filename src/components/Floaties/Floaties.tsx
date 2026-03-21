@@ -49,6 +49,23 @@ const MAX_PX = 20;
 export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) {
   const [visible, setVisible] = useState(false);
   const [vw, setVw] = useState(() => window.innerWidth);
+
+  // ✅ ADD BACK THESE
+  const [ripples, setRipples] = useState<Record<string, boolean>>({});
+
+  const handleClick = useCallback((f: Floatie) => {
+    setRipples(r => ({ ...r, [f.id]: true }));
+    setTimeout(() => {
+      setRipples(r => {
+        const copy = { ...r };
+        delete copy[f.id];
+        return copy;
+      });
+    }, 600);
+
+    onOpen(f.modal);
+  }, [onOpen]);
+
   const mouse = useRef({ x: 0, y: 0 });
   const refs = useRef<(HTMLDivElement | null)[]>([]);
   const raf = useRef(0);
@@ -101,40 +118,53 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
         const isMobile = vw < 768;
 
         const mobileScale =
-          isMobile && f.id === 'random' ? 0.85 : 1;
+          isMobile
+            ? f.pos.x < 0.2
+              ? 0.80
+              : f.id === 'random'
+              ? 0.85
+              : 1
+            : 1;
 
-        const w = f.w * t.scale * mobileScale;
-        const h = f.h * t.scale * mobileScale;
+        const scaledW = Math.round(f.w * t.scale * mobileScale);
+        const scaledH = Math.round(f.h * t.scale * mobileScale);
 
-        let left = `${f.pos.x * 100}%`;
+        const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
+
+        let leftValue = `${f.pos.x * 100}%`;
 
         if (isMobile) {
-          if (f.id === 'journal') left = '75%';
-          if (f.id === 'random') left = '68%';
-          if (f.id === 'sendNote') left = '78%';
+          if (f.pos.x < 0.2) leftValue = '8%';
+          if (f.id === 'journal') leftValue = '75%';
+          else if (f.id === 'random') leftValue = '68%';
+          else if (f.id === 'sendNote') leftValue = '78%';
         }
 
         return (
           <div
             key={f.id}
+            className="floatie-anchor"
             style={{
               position: 'fixed',
-              left,
-              top: `calc(${f.pos.y * 100}% + ${verticalOffset}px)`,
+              left: leftValue,
+              top: topValue,
               transform: 'translate(-50%, -50%)',
               opacity: visible ? t.opacity : 0,
               zIndex: 20,
             }}
           >
             <div
-              ref={el => { refs.current[i] = el; }}
-              onClick={() => onOpen(f.modal)}
-              style={{ cursor: 'pointer', filter: t.shadow }}
+              ref={el => { refs.current[i] = el; }}   // ✅ FIXED
+              className="floatie-px"
+              style={{ filter: t.shadow }}
+              onClick={() => handleClick(f)}
             >
+              {ripples[f.id] && <div className="floatie-ripple" />}
+
               <img
                 src={f.src}
-                width={w}
-                height={h}
+                width={scaledW}
+                height={scaledH}
                 style={{ display: 'block' }}
                 alt={f.label}
               />
