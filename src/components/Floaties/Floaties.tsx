@@ -273,18 +273,20 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
       {FLOATIES.map((f, i) => {
         const t = TIER[f.tier];
         const isMobile = vw < 768;
-        const scaledW = Math.round(f.w * t.scale);
-        const scaledH = Math.round(f.h * t.scale);
+
+        // On mobile: ignore tier scaling — flat 0.72 for all so left and right
+        // column illustrations are identical in size.
+        const scale = isMobile ? 0.72 : t.scale;
+        const scaledW = Math.round(f.w * scale);
+        const scaledH = Math.round(f.h * scale);
 
         // Apply verticalOffset as a pixel shift on top of the percentage-based position
         const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
 
-        // On mobile, mirror the right column to match left column overflow.
-        // Left column sits at x:0.09 → peeks ~80px in from left edge.
-        // Right column mirror: 1 - 0.09 = 0.91, so same ~80px peeks in from right.
-        // Only applies to the right column (x > 0.83). Top-right (x:0.78) is already symmetric.
+        // On mobile: mirror right column (x > 0.83) symmetrically with left column.
+        // e.g. left col at 0.10 → right mirrors to (1 - 0.10) = 0.90 = same edge distance.
         const leftValue = isMobile && f.pos.x > 0.83
-          ? '91%'
+          ? `${((1 - f.pos.x) * 100).toFixed(0)}%`
           : `${f.pos.x * 100}%`;
 
         return (
@@ -299,7 +301,7 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
             <div
               ref={el => { pxRefs.current[i] = el; }}
               className="floatie-px"
-              style={{ filter: t.shadow, opacity: t.opacity }}
+              style={{ filter: t.shadow, opacity: isMobile ? 1 : t.opacity }}
               onClick={() => handleClick(f)}
             >
               {ripples[f.id] && <div className="floatie-ripple" />}
