@@ -18,30 +18,23 @@ interface Floatie {
   src: string;
   w: number;
   h: number;
-  tier: 1 | 2 | 3;
   tilt: number;
   offsetX?: number;
 }
 
-const TIER = {
-  1: { scale: 1.0, opacity: 1.0, blur: 'none', shadow: 'drop-shadow(0 6px 18px rgba(40,28,18,0.13))' },
-  2: { scale: 0.9, opacity: 0.92, blur: 'none', shadow: 'drop-shadow(0 4px 12px rgba(40,28,18,0.09))' },
-  3: { scale: 0.82, opacity: 0.78, blur: 'none', shadow: 'drop-shadow(0 3px 8px rgba(40,28,18,0.06))' },
-} as const;
-
 const W = 260, H = 146;
 
 const FLOATIES: Floatie[] = [
-  { id: 'advice', label: 'advice & quotes', modal: 'advice', pos: { x: 0.10, y: 0.28 }, drift: 'drift1', period: '6.8s', delay: '0s', depth: 0.55, src: '/svgs/pointed%20finger%20girl.svg', w: W, h: H, tier: 2, tilt: -2 },
-  { id: 'snap', label: 'quick snap', modal: 'polaroid', pos: { x: 0.09, y: 0.52 }, drift: 'drift3', period: '7.6s', delay: '0.4s', depth: 0.42, src: '/svgs/polaroid.svg', w: W, h: H, tier: 2, tilt: 2 },
-  { id: 'movies', label: 'watched something', modal: 'movie', pos: { x: 0.10, y: 0.76 }, drift: 'drift5', period: '8.2s', delay: '0.9s', depth: 0.38, src: '/svgs/Duck%20TV.svg', w: W, h: H, tier: 2, tilt: 3 },
+  { id: 'advice', label: 'advice & quotes', modal: 'advice', pos: { x: 0.10, y: 0.28 }, drift: 'drift1', period: '6.8s', delay: '0s', depth: 0.55, src: '/svgs/pointed%20finger%20girl.svg', w: W, h: H, tilt: -2 },
+  { id: 'snap', label: 'quick snap', modal: 'polaroid', pos: { x: 0.09, y: 0.52 }, drift: 'drift3', period: '7.6s', delay: '0.4s', depth: 0.42, src: '/svgs/polaroid.svg', w: W, h: H, tilt: 2 },
+  { id: 'movies', label: 'watched something', modal: 'movie', pos: { x: 0.10, y: 0.76 }, drift: 'drift5', period: '8.2s', delay: '0.9s', depth: 0.38, src: '/svgs/Duck%20TV.svg', w: W, h: H, tilt: 3 },
 
-  { id: 'food', label: 'food & places', modal: 'cafe', pos: { x: 0.22, y: 0.11 }, drift: 'drift5', period: '5.9s', delay: '0s', depth: 0.45, src: '/svgs/eating.svg', w: W, h: H, tier: 2, tilt: -3 },
-  { id: 'activities', label: 'activities', modal: 'activity', pos: { x: 0.78, y: 0.11 }, drift: 'drift6', period: '6.3s', delay: '0.2s', depth: 0.60, src: '/svgs/travel.svg', w: W, h: H, tier: 2, tilt: 2 },
+  { id: 'food', label: 'food & places', modal: 'cafe', pos: { x: 0.22, y: 0.11 }, drift: 'drift5', period: '5.9s', delay: '0s', depth: 0.45, src: '/svgs/eating.svg', w: W, h: H, tilt: -3 },
+  { id: 'activities', label: 'activities', modal: 'activity', pos: { x: 0.78, y: 0.11 }, drift: 'drift6', period: '6.3s', delay: '0.2s', depth: 0.60, src: '/svgs/travel.svg', w: W, h: H, tilt: 2 },
 
-  { id: 'journal', label: 'add a journal entry', modal: 'journal', pos: { x: 0.87, y: 0.28 }, drift: 'drift3', period: '7.2s', delay: '0.4s', depth: 0.55, src: '/svgs/typewriter.svg', w: W, h: H, tier: 2, tilt: 3, offsetX: -30 },
-  { id: 'random', label: 'just thoughts', modal: 'typewriter', pos: { x: 0.87, y: 0.52 }, drift: 'drift2', period: '6.1s', delay: '0.5s', depth: 0.50, src: '/svgs/typing.svg', w: 310, h: 175, tier: 1, tilt: -2, offsetX: -25 },
-  { id: 'sendNote', label: 'send a note', modal: 'letter', pos: { x: 0.87, y: 0.76 }, drift: 'drift4', period: '6.9s', delay: '0.8s', depth: 0.65, src: '/svgs/duck%20letter.svg', w: W, h: H, tier: 2, tilt: 4, offsetX: -20 },
+  { id: 'journal', label: 'journal', modal: 'journal', pos: { x: 0.87, y: 0.28 }, drift: 'drift3', period: '7.2s', delay: '0.4s', depth: 0.55, src: '/svgs/typewriter.svg', w: W, h: H, tilt: 3, offsetX: -30 },
+  { id: 'random', label: 'thoughts', modal: 'typewriter', pos: { x: 0.87, y: 0.52 }, drift: 'drift2', period: '6.1s', delay: '0.5s', depth: 0.50, src: '/svgs/typing.svg', w: 310, h: 175, tilt: -2, offsetX: -25 },
+  { id: 'sendNote', label: 'note', modal: 'letter', pos: { x: 0.87, y: 0.76 }, drift: 'drift4', period: '6.9s', delay: '0.8s', depth: 0.65, src: '/svgs/duck%20letter.svg', w: W, h: H, tilt: 4, offsetX: -20 },
 ];
 
 const MAX_PX = 20;
@@ -112,12 +105,17 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
   return (
     <>
       {FLOATIES.map((f, i) => {
-        const t = TIER[f.tier];
         const isMobile = vw < 768;
 
-        // On mobile: skip tier scale entirely (use 1.0) so all floaties
-        // render at their natural SVG size without the tier downscale penalty.
-        const scale = isMobile ? 1 : t.scale;
+        // 🔥 Manual visual balancing (no tiers)
+        let scale = 1;
+
+        if (isMobile) {
+          if (f.id === 'advice') scale = 0.65;
+          else if (f.id === 'random') scale = 0.75;
+          else if (f.pos.x < 0.2) scale = 0.8;
+        }
+
         const w = Math.round(f.w * scale);
         const h = Math.round(f.h * scale);
 
@@ -130,9 +128,6 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
           if (f.id === 'sendNote') left = '82%';
         }
 
-        // OPTIONAL: remove clutter element
-        if (isMobile && f.id === 'sendNote') return null;
-
         return (
           <div
             key={f.id}
@@ -141,14 +136,17 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
               left,
               top: `calc(${f.pos.y * 100}% + ${verticalOffset}px)`,
               transform: 'translate(-50%, -50%)',
-              opacity: visible ? t.opacity : 0,
+              opacity: visible ? 1 : 0,
               zIndex: 20,
             }}
           >
             <div
               ref={el => { refs.current[i] = el; }}
               onClick={() => handleClick(f)}
-              style={{ cursor: 'pointer', filter: t.shadow }}
+              style={{
+                cursor: 'pointer',
+                filter: 'drop-shadow(0 4px 12px rgba(40,28,18,0.1))'
+              }}
             >
               {ripples[f.id] && <div className="floatie-ripple" />}
 
