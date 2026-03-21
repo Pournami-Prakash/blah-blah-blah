@@ -271,12 +271,16 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
         // Apply verticalOffset as a pixel shift on top of the percentage-based position
         const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
 
+        // Clamp left so floaties never overflow viewport edges on narrow screens
+        const half = Math.round(scaledW / 2) + 12;
+        const leftValue = `clamp(${half}px, ${f.pos.x * 100}%, calc(100% - ${half}px))`;
+
         return (
           <div
             key={f.id}
             className="floatie-anchor"
             style={{
-              left: `${f.pos.x * 100}%`,
+              left: leftValue,
               top: topValue,
             }}
           >

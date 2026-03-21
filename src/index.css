@@ -53,7 +53,7 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
      Every page background derives from these two tokens only.
   ──────────────────────────────────────────────────────────────────── */
   --bg:         #F4EFE8;   /* home, journal, modals — warm linen       */
-  --bg-wall:    #E9E3D6;   /* wall — cork board, intentionally darker   */
+  --bg-wall:    #F4EFE8;   /* wall — same as home                       */
   --bg-sheet:   #F7F3EC;   /* journal page paper                        */
   --bg-sheet-r: #F2EDE5;   /* right journal page — just a touch darker  */
 
