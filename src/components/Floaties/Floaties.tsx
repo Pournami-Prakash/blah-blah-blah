@@ -49,9 +49,11 @@ const MAX_PX = 20;
 export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) {
   const [visible, setVisible] = useState(false);
   const [vw, setVw] = useState(() => window.innerWidth);
-
-  // ✅ ADD BACK THESE
   const [ripples, setRipples] = useState<Record<string, boolean>>({});
+
+  const mouse = useRef({ x: 0, y: 0 });
+  const refs = useRef<(HTMLDivElement | null)[]>([]);
+  const raf = useRef(0);
 
   const handleClick = useCallback((f: Floatie) => {
     setRipples(r => ({ ...r, [f.id]: true }));
@@ -65,10 +67,6 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
 
     onOpen(f.modal);
   }, [onOpen]);
-
-  const mouse = useRef({ x: 0, y: 0 });
-  const refs = useRef<(HTMLDivElement | null)[]>([]);
-  const raf = useRef(0);
 
   useEffect(() => {
     const resize = () => setVw(window.innerWidth);
@@ -117,54 +115,53 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
         const t = TIER[f.tier];
         const isMobile = vw < 768;
 
-        const mobileScale =
-          isMobile
-            ? f.pos.x < 0.2
-              ? 0.80
-              : f.id === 'random'
-              ? 0.85
-              : 1
-            : 1;
-
-        const scaledW = Math.round(f.w * t.scale * mobileScale);
-        const scaledH = Math.round(f.h * t.scale * mobileScale);
-
-        const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
-
-        let leftValue = `${f.pos.x * 100}%`;
+        // 🎯 FINAL BALANCED SCALE
+        let mobileScale = 1;
 
         if (isMobile) {
-          if (f.pos.x < 0.2) leftValue = '8%';
-          if (f.id === 'journal') leftValue = '75%';
-          else if (f.id === 'random') leftValue = '68%';
-          else if (f.id === 'sendNote') leftValue = '78%';
+          if (f.pos.x < 0.2) mobileScale = 0.75;         // left reduced
+          if (f.id === 'random') mobileScale = 0.75;     // keyboard reduced
+          if (f.id === 'activities') mobileScale = 1.05; // top-right boost
         }
+
+        const w = Math.round(f.w * t.scale * mobileScale);
+        const h = Math.round(f.h * t.scale * mobileScale);
+
+        let left = `${f.pos.x * 100}%`;
+
+        if (isMobile) {
+          if (f.pos.x < 0.2) left = '6%';
+          if (f.id === 'journal') left = '78%';
+          if (f.id === 'random') left = '70%';
+          if (f.id === 'sendNote') left = '82%';
+        }
+
+        // OPTIONAL: remove clutter element
+        if (isMobile && f.id === 'sendNote') return null;
 
         return (
           <div
             key={f.id}
-            className="floatie-anchor"
             style={{
               position: 'fixed',
-              left: leftValue,
-              top: topValue,
+              left,
+              top: `calc(${f.pos.y * 100}% + ${verticalOffset}px)`,
               transform: 'translate(-50%, -50%)',
               opacity: visible ? t.opacity : 0,
               zIndex: 20,
             }}
           >
             <div
-              ref={el => { refs.current[i] = el; }}   // ✅ FIXED
-              className="floatie-px"
-              style={{ filter: t.shadow }}
+              ref={el => { refs.current[i] = el; }}
               onClick={() => handleClick(f)}
+              style={{ cursor: 'pointer', filter: t.shadow }}
             >
               {ripples[f.id] && <div className="floatie-ripple" />}
 
               <img
                 src={f.src}
-                width={scaledW}
-                height={scaledH}
+                width={w}
+                height={h}
                 style={{ display: 'block' }}
                 alt={f.label}
               />
