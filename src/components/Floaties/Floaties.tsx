@@ -281,7 +281,14 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
 
         const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
 
-        // No position tweaks — let both sides naturally overflow their edges.
+        // On mobile, stop centering near edges — anchor right-side floaties from their
+        // left edge so they don't get pulled off-screen by translate(-50%).
+        const anchorTransform = isMobile
+          ? f.pos.x >= 0.5
+            ? 'translate(0%, -50%)'    // right side: anchor left edge, stays visible
+            : 'translate(-20%, -50%)'  // left side: slight pull, mostly anchored
+          : undefined; // desktop: CSS class handles translate(-50%, -50%)
+
         const leftValue = `${f.pos.x * 100}%`;
 
         return (
@@ -291,6 +298,7 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
             style={{
               left: leftValue,
               top: topValue,
+              ...(anchorTransform ? { transform: anchorTransform } : {}),
             }}
           >
             <div
