@@ -120,9 +120,9 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
           if (f.id === 'food')        left = '20%';
           if (f.id === 'activities')  left = '80%';
           // Right column — push to right edge, peeking off symmetrically with left
-          if (f.id === 'journal')     left = '88%';
-          if (f.id === 'random')      left = '92%';   // laptop — push furthest right
-          if (f.id === 'sendNote')    left = '88%';
+          if (f.id === 'journal')     left = '94%';
+          if (f.id === 'random')      left = '96%';
+          if (f.id === 'sendNote')    left = '94%';
         }
 
         return (
