@@ -274,29 +274,17 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
         const t = TIER[f.tier];
         const isMobile = vw < 768;
 
-        // Use tier scale on all screen sizes — the sizes already looked good on mobile.
-        // Position was the only issue, not size.
-        const scaledW = Math.round(f.w * t.scale);
-        const scaledH = Math.round(f.h * t.scale);
+        // Right-column SVGs (typewriter, laptop, duck-letter) are visually smaller objects
+        // than the full-body characters on the left. Boost their render size on mobile so
+        // they feel equally prominent. Left column stays at natural tier scale.
+        const sizeBoost = isMobile && f.pos.x > 0.83 ? 1.35 : 1;
+        const scaledW = Math.round(f.w * t.scale * sizeBoost);
+        const scaledH = Math.round(f.h * t.scale * sizeBoost);
 
-        // Apply verticalOffset as a pixel shift on top of the percentage-based position
         const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
 
-        // On mobile positioning:
-        // Left col (x≈0.09-0.10) peeks ~57px off-screen left — intentional, charming
-        // Right col should mirror: same ~57px off right edge → center at ~90% of screen
-        // activities top (x=0.78) → nudge to 82% so it's more visible
-        // food top (x=0.22) → stays, fine
-        let leftValue = `${f.pos.x * 100}%`;
-        if (isMobile) {
-          if (f.pos.x > 0.83) {
-            // right column — pin to 90% so it peeks off right edge like left peeks off left
-            leftValue = '90%';
-          } else if (f.pos.x > 0.70) {
-            // activities (0.78) — pull inward slightly so more of it shows
-            leftValue = '82%';
-          }
-        }
+        // No position tweaks — let both sides naturally overflow their edges.
+        const leftValue = `${f.pos.x * 100}%`;
 
         return (
           <div
