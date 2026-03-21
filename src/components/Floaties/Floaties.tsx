@@ -117,6 +117,13 @@ const MAGNET_MAX   = 12;
 export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) {
   const [visible, setVisible] = useState(false);
   const [ripples, setRipples] = useState<Record<string, boolean>>({});
+  const [vw, setVw] = useState(() => window.innerWidth);
+
+  useEffect(() => {
+    const onResize = () => setVw(window.innerWidth);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   const rawMouse    = useRef({ x: 0, y: 0 });
   const smoothMouse = useRef({ x: 0, y: 0 });
@@ -265,15 +272,20 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
 
       {FLOATIES.map((f, i) => {
         const t = TIER[f.tier];
-        const scaledW = Math.round(f.w * t.scale);
-        const scaledH = Math.round(f.h * t.scale);
+        const isMobile = vw < 768;
+        // Scale images down on mobile so they fit without overwhelming the layout
+        const mobileScale = isMobile ? 0.72 : 1;
+        const scaledW = Math.round(f.w * t.scale * mobileScale);
+        const scaledH = Math.round(f.h * t.scale * mobileScale);
 
         // Apply verticalOffset as a pixel shift on top of the percentage-based position
         const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
 
-        // Clamp left so floaties never overflow viewport edges on narrow screens
-        const half = Math.round(scaledW / 2) + 12;
-        const leftValue = `clamp(${half}px, ${f.pos.x * 100}%, calc(100% - ${half}px))`;
+        // On mobile: left-side floaties stay at their natural % (they peek in nicely from the left edge).
+        // Right-side floaties (x > 0.6) get pixel-clamped so they're not hidden off the right edge.
+        const leftValue = isMobile && f.pos.x > 0.6
+          ? `${Math.min(f.pos.x * vw, vw - scaledW * 0.4)}px`
+          : `${f.pos.x * 100}%`;
 
         return (
           <div
