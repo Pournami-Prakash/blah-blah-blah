@@ -274,11 +274,10 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
         const t = TIER[f.tier];
         const isMobile = vw < 768;
 
-        // On mobile: ignore tier scaling — flat 0.72 for all so left and right
-        // column illustrations are identical in size.
-        const scale = isMobile ? 0.72 : t.scale;
-        const scaledW = Math.round(f.w * scale);
-        const scaledH = Math.round(f.h * scale);
+        // Use tier scale on all screen sizes — the sizes already looked good on mobile.
+        // Position was the only issue, not size.
+        const scaledW = Math.round(f.w * t.scale);
+        const scaledH = Math.round(f.h * t.scale);
 
         // Apply verticalOffset as a pixel shift on top of the percentage-based position
         const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
@@ -311,7 +310,7 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
             <div
               ref={el => { pxRefs.current[i] = el; }}
               className="floatie-px"
-              style={{ filter: t.shadow, opacity: isMobile ? 1 : t.opacity }}
+              style={{ filter: t.shadow, opacity: t.opacity }}
               onClick={() => handleClick(f)}
             >
               {ripples[f.id] && <div className="floatie-ripple" />}
