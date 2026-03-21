@@ -278,7 +278,7 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
 
         // On mobile, right-side floaties render 1.5x bigger so they match
         // the visual weight of the left-side full-body characters.
-        const sizeBoost = f.pos.x > 0.5 ? 3 : 1;
+        const sizeBoost = 3;
         const scaledW = Math.round(f.w * t.scale * sizeBoost);
         const scaledH = Math.round(f.h * t.scale * sizeBoost);
 
