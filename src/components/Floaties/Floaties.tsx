@@ -115,17 +115,11 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
         const t = TIER[f.tier];
         const isMobile = vw < 768;
 
-        // 🎯 FINAL BALANCED SCALE
-        let mobileScale = 1;
-
-        if (isMobile) {
-          if (f.pos.x < 0.2) mobileScale = 0.75;         // left reduced
-          if (f.id === 'random') mobileScale = 0.75;     // keyboard reduced
-          if (f.id === 'activities') mobileScale = 1.05; // top-right boost
-        }
-
-        const w = Math.round(f.w * t.scale * mobileScale);
-        const h = Math.round(f.h * t.scale * mobileScale);
+        // On mobile: skip tier scale entirely (use 1.0) so all floaties
+        // render at their natural SVG size without the tier downscale penalty.
+        const scale = isMobile ? 1 : t.scale;
+        const w = Math.round(f.w * scale);
+        const h = Math.round(f.h * scale);
 
         let left = `${f.pos.x * 100}%`;
 
