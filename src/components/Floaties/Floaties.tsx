@@ -283,11 +283,21 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
         // Apply verticalOffset as a pixel shift on top of the percentage-based position
         const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
 
-        // On mobile: mirror right column (x > 0.83) symmetrically with left column.
-        // e.g. left col at 0.10 → right mirrors to (1 - 0.10) = 0.90 = same edge distance.
-        const leftValue = isMobile && f.pos.x > 0.83
-          ? `${((1 - f.pos.x) * 100).toFixed(0)}%`
-          : `${f.pos.x * 100}%`;
+        // On mobile positioning:
+        // Left col (x≈0.09-0.10) peeks ~57px off-screen left — intentional, charming
+        // Right col should mirror: same ~57px off right edge → center at ~90% of screen
+        // activities top (x=0.78) → nudge to 82% so it's more visible
+        // food top (x=0.22) → stays, fine
+        let leftValue = `${f.pos.x * 100}%`;
+        if (isMobile) {
+          if (f.pos.x > 0.83) {
+            // right column — pin to 90% so it peeks off right edge like left peeks off left
+            leftValue = '90%';
+          } else if (f.pos.x > 0.70) {
+            // activities (0.78) — pull inward slightly so more of it shows
+            leftValue = '82%';
+          }
+        }
 
         return (
           <div
