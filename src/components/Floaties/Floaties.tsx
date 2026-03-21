@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import type { ModalType } from '../../hooks/useModal';
 
 interface FloatiesProps {
@@ -34,7 +33,7 @@ const FLOATIES: Floatie[] = [
   { id: 'activities', label: 'activities', modal: 'activity', pos: { x: 0.78, y: 0.11 }, drift: 'drift6', period: '6.3s', delay: '0.2s', depth: 0.60, src: '/svgs/travel.svg', w: W, h: H, tilt: 2 },
 
   { id: 'journal', label: 'journal', modal: 'journal', pos: { x: 0.87, y: 0.28 }, drift: 'drift3', period: '7.2s', delay: '0.4s', depth: 0.55, src: '/svgs/typewriter.svg', w: W, h: H, tilt: 3, offsetX: -30 },
-  { id: 'random', label: 'thoughts', modal: 'typewriter', pos: { x: 0.87, y: 0.52 }, drift: 'drift2', period: '6.1s', delay: '0.5s', depth: 0.50, src: '/svgs/typing.svg', w: W, h: H, tilt: -2, offsetX: -25 },
+  { id: 'random', label: 'thoughts', modal: 'typewriter', pos: { x: 0.87, y: 0.52 }, drift: 'drift2', period: '6.1s', delay: '0.5s', depth: 0.50, src: '/svgs/typing.svg', w: 310, h: 175, tilt: -2, offsetX: -25 },
   { id: 'sendNote', label: 'note', modal: 'letter', pos: { x: 0.87, y: 0.76 }, drift: 'drift4', period: '6.9s', delay: '0.8s', depth: 0.65, src: '/svgs/duck%20letter.svg', w: W, h: H, tilt: 4, offsetX: -20 },
 ];
 
@@ -103,14 +102,32 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
     };
   }, []);
 
-  return createPortal(
+  return (
     <>
       {FLOATIES.map((f, i) => {
         const isMobile = vw < 768;
 
-        const scale = 0.90;
-        const w = Math.round(f.w * scale);
-        const h = Math.round(f.h * scale);
+        // 🔥 BASE SCALE (mobile balance)
+        let baseScale = 1;
+
+        if (isMobile) {
+          if (f.id === 'advice') baseScale = 0.65;
+          else if (f.id === 'random') baseScale = 0.75;
+          else if (f.pos.x < 0.2) baseScale = 0.8;
+        }
+
+        // 🔥 VISUAL COMPENSATION (FIXES YOUR ISSUE)
+        const visualScaleMap: Record<string, number> = {
+          journal: 1.15,
+          random: 1.20,
+          sendNote: 1.15,
+          activities: 1.10,
+        };
+
+        const visualScale = visualScaleMap[f.id] || 1;
+
+        const w = Math.round(f.w * baseScale * visualScale);
+        const h = Math.round(f.h * baseScale * visualScale);
 
         let left = `${f.pos.x * 100}%`;
 
@@ -154,7 +171,6 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
           </div>
         );
       })}
-    </>,
-    document.body
+    </>
   );
 }
