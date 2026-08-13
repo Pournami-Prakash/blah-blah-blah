@@ -1,233 +1,75 @@
-# whisper. — Anonymous Globe-Based Sharing Platform
+# blah blah blah
 
-A beautiful, minimalist frontend for sharing anonymous whispers, moments, and recommendations across the globe.
+### a small corner of the internet for things that almost went unsaid.
 
-## Project Structure
+[wander around the globe →](https://blah.pournamiprakash.dev)
 
-```
-whisper-frontend/
-├── public/                          # Static assets
-│   └── favicon.svg
-├── src/
-│   ├── api/                         # API client with mock fallback
-│   │   └── client.ts
-│   ├── components/
-│   │   ├── Globe/                   # D3 canvas globe with pins
-│   │   │   └── Globe.tsx
-│   │   ├── Floaties/                # Animated floating UI elements
-│   │   │   └── Floaties.tsx
-│   │   ├── Nav/                     # Shared navigation bar
-│   │   │   └── SharedNav.tsx
-│   │   ├── feed/                    # Feed and wall components
-│   │   │   ├── CityFeed.tsx         # City-specific feed
-│   │   │   ├── WhisperWall.tsx      # Global feed
-│   │   │   └── cards/               # Post type card components
-│   │   │       ├── LetterCard.tsx
-│   │   │       ├── PolaroidCard.tsx
-│   │   │       ├── TypewriterCard.tsx
-│   │   │       ├── CafeCard.tsx
-│   │   │       ├── JournalCard.tsx
-│   │   │       └── ActivityCard.tsx
-│   │   ├── journal/                 # Open journal
-│   │   │   └── SharedJournal.tsx
-│   │   └── modals/                  # Compose modals
-│   │       ├── BottomSheet.tsx      # Base modal component
-│   │       ├── ComposeModal.tsx     # Three-kind selector
-│   │       ├── ComposeStack.tsx     # Shared compose flow
-│   │       ├── ThoughtComposer.tsx  # All text styles
-│   │       ├── RecommendationComposer.tsx
-│   │       ├── PolaroidModal.tsx
-│   ├── data/
-│   │   └── mock.ts                  # Mock data for development
-│   ├── hooks/
-│   │   └── useModal.ts              # Modal state management
-│   ├── pages/                       # Route pages
-│   │   ├── Home.tsx                 # Main globe page
-│   │   ├── Wall.tsx                 # Explore/feed page
-│   │   ├── JournalPage.tsx          # Journal page
-│   │   └── CityPage.tsx             # City-specific page
-│   ├── types/
-│   │   └── index.ts                 # TypeScript type definitions
-│   ├── App.tsx                      # Router setup
-│   ├── main.tsx                     # Entry point
-│   └── index.css                    # Global styles and animations
-├── index.html                       # HTML template
-├── package.json                     # Dependencies
-├── vite.config.ts                   # Vite build config
-├── tsconfig.json                    # TypeScript config
-├── tailwind.config.js               # Tailwind CSS config
-└── postcss.config.js                # PostCSS config
-```
+---
 
-## Setup
+Most social spaces ask who you are before they let you speak.
 
-### Install Dependencies
-```bash
-npm install
-```
+This one doesn’t.
 
-### Development
-```bash
-npm run dev
-```
-Starts dev server at http://localhost:5173
+**blah blah blah** began as a just-for-fun experiment: what if the internet felt less like a stage and more like a scrapbook someone forgot open on a café table?
 
-### Build
-```bash
-npm run build
-```
+No profile to polish. No followers to impress. No algorithm deciding what deserves attention. Just a slowly turning globe, a collection of tiny illustrated objects, and thoughts left behind by people passing through.
 
-### Preview
-```bash
-npm run preview
-```
+## take a spin
 
-## Design System
+The first thing you meet is the globe.
 
-### Colors
-- **Background**: `#F7F3EE` (warm cream)
-- **Dark**: `#2A2420` (near-black)
-- **Muted**: `#8A7A6A` (soft brown-grey)
-- **Border**: `#E8E0D4` (light warm)
-- **Input**: `#EDE8DF` (cream variant)
-- **Pin**: `#7A9A70` (globe green)
-- **Globe**: `#60A060` (brighter green)
+Drag it. Turn it. Follow a pin to a city and see what someone left there—or open the city list if geography was never your thing. Every pin holds something small: a thought from today, a photograph worth keeping, or a recommendation whispered from one stranger to another.
 
-### Typography
-- **Playfair Display**: Serif italic titles
-- **DM Sans**: Body and UI text
-- **DM Mono**: Monospace labels and counters
-- **Caveat**: Handwriting-style compose text
+If choosing feels like too much, **surprise me ✦** picks a whisper at random.
 
-### Components
-- Rounded corners: 8px, 12px, 16px, 24px
-- Shadows: Subtle (0 2px 8px) to elevated (0 4px 16px)
-- Animations: Drift, blink, spark
+## leave something behind
 
-## Features
+There are only three doors:
 
-### Simple content model
+### ✏️ a thought
 
-Visitors choose from three clear kinds of contribution:
+A passing idea. A letter to nobody in particular. Advice learned too late. A line from today’s journal. The kind of sentence that usually disappears because there was nowhere to put it.
 
-- **Thought** — quick thought, letter, advice, or journal style
-- **Moment** — photo and optional caption
-- **Recommendation** — food/place, movie/series, or activity
+### 📷 a moment
 
-The older database `type` values remain as visual styles for backwards compatibility.
+One photograph and, if it needs one, a caption. Nothing polished. Just proof that something ordinary happened and felt worth noticing.
 
-### Playful discovery
+### 🗺️ a recommendation
 
-- “Surprise me” opens a random whisper
-- A daily prompt changes once per day
-- Cities can be found through the globe or a searchable city list
-- Every whisper has a shareable `/whisper/:id` link
-- Anonymous safety reports are supported
+A hidden café. A movie that stayed with you. A rainy-day activity. Somewhere to go, something to watch, or a tiny experience another person might love.
 
-### Pages
+A new prompt appears each day for anyone who wants to contribute but does not know where to begin.
 
-**Home** (`/`)
-- Interactive D3 globe with city pins
-- Animated floating UI elements (Floaties)
-- Click pins to view city feeds
-- Click Floaties to start composing
+## the places whispers gather
 
-**Wall** (`/wall`)
-- Browse all whispers globally
-- Filter by type (letter, polaroid, typewriter, café, journal, activity)
-- Masonry grid layout
+The **wall** holds everything together like notes pinned to a shared corkboard. Thoughts, moments, and recommendations keep their own visual character instead of being flattened into identical cards.
 
-**Journal** (`/journal`)
-- Open collaborative journal
-- Everyone can contribute anonymously
-- Timeline view with location tags
-- Journal paper aesthetic
-- Reads and writes journal-styled posts from the shared `posts` table
+The **journal** is quieter. It collects journal-style thoughts on warm, ruled pages and turns many anonymous fragments into one shared diary.
 
-**City** (`/city/:cityName`)
-- Whispers from a specific city
-- Search-driven discovery
+Every **city** gets its own little collection. An empty city is not a dead end—it is an invitation to leave the first whisper there.
 
-### Post Types
+Every whisper also has its own shareable page, so a tiny anonymous thought can travel beyond the globe without needing an account attached to it.
 
-1. **Letter**: Write advice or messages
-2. **Polaroid**: Share a photo with caption
-3. **Typewriter**: Raw typed thoughts
-4. **Café/Place**: Recommend locations
-5. **Journal**: Free-write journal entries
-6. **Activity**: Suggest things to do
+## what this place refuses to become
 
-## Key Components
+There are no accounts, profiles, follower counts, comments, private messages, notifications, streaks, or endless algorithmic feeds.
 
-### Globe.tsx
-- Canvas-based D3 orthographic projection
-- Auto-rotates, pausable on drag
-- Mouse/touch rotation, scroll zoom
-- Halftone dot fill for landmasses
-- Glowing pin markers with city labels
-- Loads GeoJSON from Natural Earth
+Likes are anonymous and lightweight. Reports exist to keep the public space safer. The project is interested in discovery and expression—not turning attention into a competition.
 
-### Floaties.tsx
-- 8 animated floating SVG illustrations
-- Gentle drift animations
-- Hover labels and click handlers
-- Positioned around globe area
+## behind the scrapbook
 
-### Modals
-- Bottom sheet UX with spring animations
-- Form validation
-- Loading and success states
-- Mock API with fallback to real endpoints
+The playful surface is built with **React**, **TypeScript**, **Vite**, **D3**, and **Framer Motion**. **Supabase** stores whispers, photographs, locations, anonymous likes, and private safety reports.
 
-### Feed Components
-- Responsive grid layouts
-- Type-specific card styling
-- Smooth transitions and hover effects
-- Location and like count display
+The globe is rendered on canvas with an orthographic D3 projection. City pins are aggregated from located whispers. Pages are loaded in separate route chunks, and the same shared components power city previews, full city pages, post cards, navigation, and composing flows.
 
-## API Integration
+The content model stays deliberately simple—**thought**, **moment**, and **recommendation**—while older post styles remain underneath so existing letters, polaroids, journal entries, café notes, and activities keep their individual look.
 
-Fully functional API client with mock fallback (VITE_USE_MOCK=true by default).
+## made to feel like
 
-After the initial schema, apply `supabase/migrations/002_consolidate_content.sql`. It non-destructively copies historical `journal_entries` into `posts` and creates the private `post_reports` table.
+Warm paper. Slightly crooked photographs. Notes written in the margin. A duck carrying a letter. The quiet fun of opening a drawer and finding something you had forgotten.
 
-### Endpoints (when backend is available)
-```
-GET /posts          → All posts
-POST /posts         → Create post
-GET /pins           → City pins
-GET /journal        → Journal entries
-POST /journal       → Add journal entry
-POST /posts/:id/like → Like post
-```
+Playful, cute, a little nostalgic—and never too serious about itself.
 
-## Development
+---
 
-### Environment Variables
-Create `.env.local`:
-```
-VITE_API_URL=http://localhost:8000
-VITE_USE_MOCK=true
-```
-
-### Mock Data
-All data is pre-populated in `src/data/mock.ts` including:
-- 15 major cities with pins
-- 10 diverse posts across all types
-- 8 journal entries
-
-## Browser Support
-Modern browsers supporting ES2020, Canvas 2D, and CSS Grid/Flexbox.
-
-## Performance
-- D3 canvas rendering optimized for smooth 60fps globe
-- Lazy component loading via React Router
-- CSS animations use GPU acceleration
-- Images optimized via Unsplash CDN
-
-## Build Output
-Production build (~200KB gzipped):
-- Minified React + Router
-- D3 library (~250KB uncompressed)
-- Framer Motion (~150KB uncompressed)
-- Tailwind CSS
+*leave a whisper. let the globe carry it.*
