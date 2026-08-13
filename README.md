@@ -16,8 +16,8 @@ whisper-frontend/
 │   │   │   └── Globe.tsx
 │   │   ├── Floaties/                # Animated floating UI elements
 │   │   │   └── Floaties.tsx
-│   │   ├── Nav/                     # Navigation bar
-│   │   │   └── Nav.tsx
+│   │   ├── Nav/                     # Shared navigation bar
+│   │   │   └── SharedNav.tsx
 │   │   ├── feed/                    # Feed and wall components
 │   │   │   ├── CityFeed.tsx         # City-specific feed
 │   │   │   ├── WhisperWall.tsx      # Global feed
@@ -32,13 +32,11 @@ whisper-frontend/
 │   │   │   └── SharedJournal.tsx
 │   │   └── modals/                  # Compose modals
 │   │       ├── BottomSheet.tsx      # Base modal component
-│   │       ├── ComposeModal.tsx     # Type selector
-│   │       ├── LetterModal.tsx
+│   │       ├── ComposeModal.tsx     # Three-kind selector
+│   │       ├── ComposeStack.tsx     # Shared compose flow
+│   │       ├── ThoughtComposer.tsx  # All text styles
+│   │       ├── RecommendationComposer.tsx
 │   │       ├── PolaroidModal.tsx
-│   │       ├── TypewriterModal.tsx
-│   │       ├── CafeModal.tsx
-│   │       ├── JournalModal.tsx
-│   │       └── ActivityModal.tsx
 │   ├── data/
 │   │   └── mock.ts                  # Mock data for development
 │   ├── hooks/
@@ -108,6 +106,24 @@ npm run preview
 
 ## Features
 
+### Simple content model
+
+Visitors choose from three clear kinds of contribution:
+
+- **Thought** — quick thought, letter, advice, or journal style
+- **Moment** — photo and optional caption
+- **Recommendation** — food/place, movie/series, or activity
+
+The older database `type` values remain as visual styles for backwards compatibility.
+
+### Playful discovery
+
+- “Surprise me” opens a random whisper
+- A daily prompt changes once per day
+- Cities can be found through the globe or a searchable city list
+- Every whisper has a shareable `/whisper/:id` link
+- Anonymous safety reports are supported
+
 ### Pages
 
 **Home** (`/`)
@@ -126,6 +142,7 @@ npm run preview
 - Everyone can contribute anonymously
 - Timeline view with location tags
 - Journal paper aesthetic
+- Reads and writes journal-styled posts from the shared `posts` table
 
 **City** (`/city/:cityName`)
 - Whispers from a specific city
@@ -171,6 +188,8 @@ npm run preview
 ## API Integration
 
 Fully functional API client with mock fallback (VITE_USE_MOCK=true by default).
+
+After the initial schema, apply `supabase/migrations/002_consolidate_content.sql`. It non-destructively copies historical `journal_entries` into `posts` and creates the private `post_reports` table.
 
 ### Endpoints (when backend is available)
 ```

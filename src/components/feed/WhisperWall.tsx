@@ -1,16 +1,11 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import LetterCard from './cards/LetterCard';
-import PolaroidCard from './cards/PolaroidCard';
-import PolaroidWall from './cards/PolaroidWall';
-import TypewriterCard from './cards/TypewriterCard';
-import CafeCard from './cards/CafeCard';
-import ActivityCard from './cards/ActivityCard';
+import PostCard from './PostCard';
 import { getPosts } from '../../api/client';
-import type { Post, PostType, PolaroidPost } from '../../types';
+import type { Post, PostType } from '../../types';
 
 // ── Filter structure ────────────────────────────────────────────────────────
-type GroupKey  = 'all' | 'notes' | 'moments' | 'places';
+type GroupKey  = 'all' | 'thoughts' | 'moments' | 'recommendations';
 type SubKey    = PostType | null;
 
 interface SubFilter { key: PostType; label: string }
@@ -29,11 +24,12 @@ const GROUPS: Group[] = [
     types: [], sub: [],
   },
   {
-    key: 'notes', label: 'notes & thoughts', color: '#C88010', icon: '✏️',
-    types: ['letter', 'typewriter'],
+    key: 'thoughts', label: 'thoughts', color: '#C88010', icon: '✏️',
+    types: ['letter', 'typewriter', 'journal'],
     sub: [
       { key: 'letter',     label: 'letters'  },
       { key: 'typewriter', label: 'thoughts' },
+      { key: 'journal',    label: 'journal'  },
     ],
   },
   {
@@ -42,7 +38,7 @@ const GROUPS: Group[] = [
     sub: [],
   },
   {
-    key: 'places', label: 'places & things to do', color: '#C85030', icon: '🌍',
+    key: 'recommendations', label: 'recommendations', color: '#C85030', icon: '🌍',
     types: ['cafe', 'activity'],
     sub: [
       { key: 'cafe',     label: 'cafés & spots'  },
@@ -57,26 +53,17 @@ function seedRot(id: string): number {
   return ((h % 9) - 4) * 0.38;
 }
 
-function renderCard(post: Post) {
-  switch (post.type) {
-    case 'letter':     return <LetterCard     post={post} />;
-    case 'polaroid':   return <PolaroidCard   post={post} />;
-    case 'typewriter': return <TypewriterCard post={post} />;
-    case 'cafe':       return <CafeCard       post={post} />;
-    case 'activity':   return <ActivityCard   post={post} />;
-  }
-}
-
 export default function WhisperWall() {
   const [allPosts, setAllPosts]   = useState<Post[]>([]);
   const [group,    setGroup]      = useState<GroupKey>('all');
   const [sub,      setSub]        = useState<SubKey>(null);
   const [loading,  setLoading]    = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   // Always fetch everything once — filter client-side
   useEffect(() => {
     setLoading(true);
-    getPosts({}).then(setAllPosts).finally(() => setLoading(false));
+    getPosts({}).then(setAllPosts).catch(() => setLoadError(true)).finally(() => setLoading(false));
   }, []);
 
   const activeGroup = GROUPS.find(g => g.key === group)!;
@@ -92,9 +79,6 @@ export default function WhisperWall() {
     setGroup(g);
     setSub(null);
   };
-
-  const isPolaroidOnly = sub === 'polaroid' || (group === 'moments' && !sub && posts.every(p => p.type === 'polaroid'));
-  const polaroidPosts  = posts.filter((p): p is PolaroidPost => p.type === 'polaroid');
 
   return (
     <>
@@ -352,7 +336,9 @@ export default function WhisperWall() {
         </div>
 
         {/* ── Post grid ─────────────────────────────────── */}
-        {loading ? (
+        {loadError ? (
+          <div style={{ padding: '70px 20px', textAlign: 'center', color: '#715B4A' }}><p>the wall is being shy right now.</p><button onClick={() => window.location.reload()} style={{ border: '1px dashed #9B806C', background: 'transparent', padding: '8px 13px', cursor: 'pointer' }}>try again</button></div>
+        ) : loading ? (
           /* Shimmer skeleton — 9 cards, varied heights, 3-col masonry */
           <div style={{ columns: 'var(--wall-cols, 3)', columnGap: '22px' }}>
             {[180, 240, 160, 220, 140, 200, 170, 260, 150].map((h, i) => (
@@ -418,8 +404,6 @@ export default function WhisperWall() {
               be the first to leave something
             </span>
           </motion.div>
-        ) : isPolaroidOnly && polaroidPosts.length > 0 ? (
-          <PolaroidWall posts={polaroidPosts} />
         ) : (
           <div style={{ columns: 'var(--wall-cols, 3)', columnGap: '22px' }}>
             {posts.map((post, i) => (
@@ -436,7 +420,7 @@ export default function WhisperWall() {
                   delay: Math.min(i * 0.04, 0.5),
                 }}
               >
-                {renderCard(post)}
+                <PostCard post={post} />
               </motion.div>
             ))}
           </div>

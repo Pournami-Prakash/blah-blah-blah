@@ -1,4 +1,14 @@
 export type PostType = 'letter' | 'polaroid' | 'typewriter' | 'cafe' | 'journal' | 'activity';
+export type ContentKind = 'thought' | 'moment' | 'recommendation';
+
+export const POST_KIND: Record<PostType, ContentKind> = {
+  letter: 'thought',
+  typewriter: 'thought',
+  journal: 'thought',
+  polaroid: 'moment',
+  cafe: 'recommendation',
+  activity: 'recommendation',
+};
 
 export interface Location {
   city: string;
@@ -75,4 +85,9 @@ export interface CityFeedResponse {
   country: string;
   posts: Post[];
   total: number;
+}
+
+export interface PostReport {
+  postId: string;
+  reason: 'spam' | 'harmful' | 'private-info' | 'other';
 }

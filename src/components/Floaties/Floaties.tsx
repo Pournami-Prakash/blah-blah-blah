@@ -42,6 +42,10 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
   const [visible, setVisible] = useState(false);
   const [vw, setVw] = useState(() => window.innerWidth);
   const [ripples, setRipples] = useState<Record<string, boolean>>({});
+  const [mobileIds] = useState(() => {
+    const shuffled = [...FLOATIES].sort(() => Math.random() - 0.5);
+    return new Set(shuffled.slice(0, 4).map(item => item.id));
+  });
 
   const mouse = useRef({ x: 0, y: 0 });
   const refs  = useRef<(HTMLDivElement | null)[]>([]);
@@ -103,6 +107,7 @@ export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) 
 
       {FLOATIES.map((f, i) => {
         const isMobile = vw < 768;
+        if (isMobile && !mobileIds.has(f.id)) return null;
         const scale    = 0.90;
         const w        = Math.round(f.w * scale);
         const h        = Math.round(f.h * scale);
