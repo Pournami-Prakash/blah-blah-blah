@@ -1,18 +1,12 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { motion, useMotionValue, useSpring } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import Globe from '../components/Globe/Globe';
 import Floaties from '../components/Floaties/Floaties';
-import ComposeModal from '../components/modals/ComposeModal';
-import LetterModal from '../components/modals/LetterModal';
-import PolaroidModal from '../components/modals/PolaroidModal';
-import TypewriterModal from '../components/modals/TypewriterModal';
-import CafeModal from '../components/modals/CafeModal';
-import JournalModal from '../components/modals/JournalModal';
-import ActivityModal from '../components/modals/ActivityModal';
-import AdviceModal from '../components/modals/AdviceModal';
+import ComposeStack from '../components/modals/ComposeStack';
 import CityFeed from '../components/feed/CityFeed';
 import InteractiveDotGrid from '../components/InteractiveDotGrid/InteractiveDotGrid';
+import SharedNav from '../components/Nav/SharedNav';
+import CityBrowser from '../components/Globe/CityBrowser';
 import { useModal } from '../hooks/useModal';
 import { getPins, getPosts } from '../api/client';
 import type { Pin } from '../types';
@@ -564,9 +558,9 @@ export default function Home() {
   useCursorTrail();
 
   useEffect(() => {
-    Promise.all([getPins(), getPosts({ limit: 20 })]).then(([pinsData, postsData]) => {
-      setPins(pinsData);
-      setPosts(postsData as any[]);
+    Promise.allSettled([getPins(), getPosts({ limit: 20 })]).then(([pinsResult, postsResult]) => {
+      if (pinsResult.status === 'fulfilled') setPins(pinsResult.value);
+      if (postsResult.status === 'fulfilled') setPosts(postsResult.value as any[]);
       setTimeout(() => {
         setLoaded(true);
         if (!sessionStorage.getItem('bbb_hinted') && !hintShownRef.current) {
@@ -677,16 +671,7 @@ export default function Home() {
         <path d="M 1418 878 L 1394 878 M 1418 878 L 1418 854" fill="none" stroke="rgba(200,84,58,0.14)" strokeWidth="1.3" strokeLinecap="round" />
       </svg>
 
-      {/* Nav */}
-      <nav style={{ position: 'fixed', top: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 32px', zIndex: 30, opacity: loaded ? 1 : 0, transition: 'opacity 0.6s ease 0.2s' }}>
-        <span style={{ fontFamily: '"Playfair Display", serif', fontStyle: 'italic', fontSize: '14px', color: '#0F0D0B', letterSpacing: '-0.01em', opacity: 0.45 }}>
-          b<span style={{ color: '#E8543A' }}>.</span>b<span style={{ color: '#EDB846' }}>.</span>b
-        </span>
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-          <Link to="/wall"    className="home-nav-link" title="Browse all whispers">wall</Link>
-          <Link to="/journal" className="home-nav-link" title="Shared journal">journal</Link>
-        </div>
-      </nav>
+      <SharedNav visible={loaded} />
 
       {/* Globe stack */}
       <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0, opacity: loaded ? 1 : 0, transform: loaded ? 'translateY(0)' : 'translateY(10px)', transition: 'opacity 0.8s ease 0.1s, transform 0.8s ease 0.1s' }}>
@@ -727,6 +712,7 @@ export default function Home() {
           <LiquidButton onClick={e => { burstConfetti(e.currentTarget as HTMLElement); openModal('compose'); }}>
             + leave a whisper
           </LiquidButton>
+          <CityBrowser pins={pins} />
         </div>
       </div>
 
@@ -737,15 +723,7 @@ export default function Home() {
       {loaded && <WhisperTicker posts={posts} />}
 
       {/* Modals */}
-      <ComposeModal isOpen={activeModal === 'compose'} onClose={closeModal} onSelectType={openModal} />
-      <LetterModal isOpen={activeModal === 'letter'} onClose={closeModal} />
-      <PolaroidModal isOpen={activeModal === 'polaroid'} onClose={closeModal} />
-      <TypewriterModal isOpen={activeModal === 'typewriter'} onClose={closeModal} />
-      <CafeModal isOpen={activeModal === 'cafe'} onClose={closeModal} />
-      <JournalModal isOpen={activeModal === 'journal'} onClose={closeModal} />
-      <ActivityModal isOpen={activeModal === 'activity'} onClose={closeModal} lockedMode="doing" />
-      <ActivityModal isOpen={activeModal === 'movie'}    onClose={closeModal} lockedMode="movie" />
-      <AdviceModal   isOpen={activeModal === 'advice'}   onClose={closeModal} />
+      <ComposeStack activeModal={activeModal} openModal={openModal} closeModal={closeModal} />
       <CityFeed isOpen={activeModal === 'cityFeed'} onClose={closeModal} pin={selectedCity} onOpenCompose={() => openModal('compose')} />
     </div>
   );

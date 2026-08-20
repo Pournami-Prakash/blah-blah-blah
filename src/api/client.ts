@@ -1,6 +1,6 @@
 import { supabase, getSessionId } from '../lib/supabase';
 import { moderateTextLocally, moderateFile, extractTextFromPost } from '../lib/moderation';
-import type { Post, Pin, JournalEntry, PostType, Location } from '../types';
+import type { Post, Pin, JournalEntry, PostType, Location, PostReport } from '../types';
 import { MOCK_POSTS, MOCK_PINS, MOCK_JOURNAL } from '../data/mock';
 
 // ── Server-side moderation helpers ───────────────────────────────────────────
@@ -100,6 +100,23 @@ export async function getPosts(
   return (data ?? []).map(rowToPost);
 }
 
+export async function getPostById(id: string): Promise<Post | null> {
+  if (USE_MOCK) return MOCK_POSTS.find(post => post.id === id) ?? null;
+  const { data, error } = await supabase.from('posts').select('*').eq('id', id).maybeSingle();
+  if (error) throw error;
+  return data ? rowToPost(data) : null;
+}
+
+export async function getRandomPost(): Promise<Post | null> {
+  const posts = await getPosts({ limit: 100 });
+  return posts.length ? posts[Math.floor(Math.random() * posts.length)] : null;
+}
+
+export async function getCities(): Promise<Pin[]> {
+  const pins = await getPins();
+  return [...pins].sort((a, b) => a.city.localeCompare(b.city));
+}
+
 // ── createPost ────────────────────────────────────────────────────────────────
 export async function createPost(data: {
   type: PostType;
@@ -113,6 +130,7 @@ export async function createPost(data: {
   attribution?: string;
   imageUrl?: string;
   caption?: string;
+  city?: string;
 }): Promise<Post> {
   if (USE_MOCK) {
     const newPost = {
@@ -165,7 +183,7 @@ export async function createPost(data: {
     tags:        data.tags,
     image_url:   imageUrl,
     caption:     data.caption,
-    city:        data.location?.city,
+    city:        data.city ?? data.location?.city,
     country:     data.location?.country,
     lat:         data.location?.lat,
     lng:         data.location?.lng,
@@ -212,18 +230,12 @@ export async function getPins(): Promise<Pin[]> {
 // ── getJournalEntries ─────────────────────────────────────────────────────────
 export async function getJournalEntries(): Promise<JournalEntry[]> {
   if (USE_MOCK) return MOCK_JOURNAL;
-
-  const { data, error } = await supabase
-    .from('journal_entries')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) throw error;
-  return (data ?? []).map(r => ({
-    id:        r.id,
-    content:   r.content,
-    city:      r.city,
-    createdAt: r.created_at,
+  const posts = await getPosts({ type: 'journal' });
+  return posts.map(post => ({
+    id: post.id,
+    content: post.type === 'journal' ? post.content : '',
+    city: post.location?.city,
+    createdAt: post.createdAt,
   }));
 }
 
@@ -246,11 +258,20 @@ export async function addJournalEntry(content: string, city?: string): Promise<J
   await checkTextServer(content);
 
   const { data, error } = await supabase
-    .from('journal_entries')
-    .insert({ content, city })
+    .from('posts')
+    .insert({ type: 'journal', content, city })
     .select()
     .single();
-
   if (error) throw error;
-  return { id: data.id, content: data.content, city: data.city, createdAt: data.created_at };
+  return { id: data.id, content, city, createdAt: data.created_at };
+}
+
+export async function reportPost(report: PostReport): Promise<void> {
+  if (USE_MOCK) return;
+  const { error } = await supabase.from('post_reports').insert({
+    post_id: report.postId,
+    session_id: getSessionId(),
+    reason: report.reason,
+  });
+  if (error) throw error;
 }

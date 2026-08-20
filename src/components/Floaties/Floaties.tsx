@@ -1,348 +1,177 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { createPortal } from 'react-dom';
 import type { ModalType } from '../../hooks/useModal';
 
 interface FloatiesProps {
   onOpen: (modal: ModalType) => void;
-  /** Push all floaties down by this many pixels (default 0) */
   verticalOffset?: number;
 }
 
 interface Floatie {
-  id:      string;
-  label:   string;
-  modal:   ModalType;
-  pos:     { x: number; y: number };
-  drift:   string;
-  period:  string;
-  delay:   string;
-  depth:   number;
-  src:     string;
-  w:       number;
-  h:       number;
-  tier:    1 | 2 | 3;
-  tilt:    number;
-  offsetX?: number; // px correction for SVG artwork not centered in viewBox
+  id: string;
+  label: string;
+  modal: ModalType;
+  pos: { x: number; y: number };
+  drift: string;
+  period: string;
+  delay: string;
+  depth: number;
+  src: string;
+  w: number;
+  h: number;
+  tilt: number;
+  offsetX?: number;
 }
 
-const TIER: Record<1|2|3, { scale: number; opacity: number; blur: string; shadow: string }> = {
-  1: { scale: 1.00, opacity: 1.00, blur: 'none', shadow: 'drop-shadow(0 6px 18px rgba(40,28,18,0.13))' },
-  2: { scale: 0.90, opacity: 0.92, blur: 'none', shadow: 'drop-shadow(0 4px 12px rgba(40,28,18,0.09))' },
-  3: { scale: 0.82, opacity: 0.78, blur: 'none', shadow: 'drop-shadow(0 3px 8px rgba(40,28,18,0.06))' },
-};
-
 const W = 260, H = 146;
+
 const FLOATIES: Floatie[] = [
-  // ── Left column ────────────────────────────────────────────────
-  {
-    id: 'advice',
-    label: 'advice & quotes',
-    modal: 'advice',
-    pos: { x: 0.10, y: 0.28 },
-    drift: 'drift1', period: '6.8s', delay: '0s', depth: 0.55,
-    src: '/svgs/pointed%20finger%20girl.svg', w: W, h: H,
-    tier: 2, tilt: -2,
-  },
-  {
-    id: 'snap',
-    label: 'quick snap',
-    modal: 'polaroid',
-    pos: { x: 0.09, y: 0.52 },
-    drift: 'drift3', period: '7.6s', delay: '0.4s', depth: 0.42,
-    src: '/svgs/polaroid.svg', w: W, h: H,
-    tier: 2, tilt: 2,
-  },
-  {
-    id: 'movies',
-    label: 'watched something',
-    modal: 'movie',
-    pos: { x: 0.10, y: 0.76 },
-    drift: 'drift5', period: '8.2s', delay: '0.9s', depth: 0.38,
-    src: '/svgs/Duck%20TV.svg', w: W, h: H,
-    tier: 2, tilt: 3,
-  },
-
-  // ── Top ────────────────────────────────────────────────────────
-  {
-    id: 'food',
-    label: 'food & places',
-    modal: 'cafe',
-    pos: { x: 0.22, y: 0.11 },
-    drift: 'drift5', period: '5.9s', delay: '0s', depth: 0.45,
-    src: '/svgs/eating.svg', w: W, h: H,
-    tier: 2, tilt: -3,
-  },
-  {
-    id: 'activities',
-    label: 'activities',
-    modal: 'activity',
-    pos: { x: 0.78, y: 0.11 },
-    drift: 'drift6', period: '6.3s', delay: '0.2s', depth: 0.60,
-    src: '/svgs/travel.svg', w: W, h: H,
-    tier: 2, tilt: 2,
-  },
-
-  // ── Right column ───────────────────────────────────────────────
-  {
-    id: 'journal',
-    label: 'add a journal entry',
-    modal: 'journal',
-    pos: { x: 0.87, y: 0.28 },
-    drift: 'drift3', period: '7.2s', delay: '0.4s', depth: 0.55,
-    src: '/svgs/typewriter.svg', w: W, h: H,
-    tier: 2, tilt: 3, offsetX: -30,
-  },
-  {
-    id: 'random',
-    label: 'just thoughts',
-    modal: 'typewriter',
-    pos: { x: 0.87, y: 0.52 },
-    drift: 'drift2', period: '6.1s', delay: '0.5s', depth: 0.50,
-    src: '/svgs/typing.svg', w: 310, h: 175,
-    tier: 1, tilt: -2, offsetX: -25,
-  },
-  {
-    id: 'sendNote',
-    label: 'send a note',
-    modal: 'letter',
-    pos: { x: 0.87, y: 0.76 },
-    drift: 'drift4', period: '6.9s', delay: '0.8s', depth: 0.65,
-    src: '/svgs/duck%20letter.svg', w: W, h: H,
-    tier: 2, tilt: 4, offsetX: -20,
-  },
+  { id: 'advice',    label: 'advice & quotes',   modal: 'advice',     pos: { x: 0.10, y: 0.28 }, drift: 'drift1', period: '6.8s', delay: '0s',   depth: 0.55, src: '/svgs/pointed%20finger%20girl.svg', w: W, h: H, tilt: -2 },
+  { id: 'snap',      label: 'quick snap',         modal: 'polaroid',   pos: { x: 0.09, y: 0.52 }, drift: 'drift3', period: '7.6s', delay: '0.4s', depth: 0.42, src: '/svgs/polaroid.svg',                 w: W, h: H, tilt:  2 },
+  { id: 'movies',    label: 'watched something',  modal: 'movie',      pos: { x: 0.10, y: 0.76 }, drift: 'drift5', period: '8.2s', delay: '0.9s', depth: 0.38, src: '/svgs/Duck%20TV.svg',                 w: W, h: H, tilt:  3 },
+  { id: 'food',      label: 'food & places',      modal: 'cafe',       pos: { x: 0.22, y: 0.11 }, drift: 'drift5', period: '5.9s', delay: '0s',   depth: 0.45, src: '/svgs/eating.svg',                    w: W, h: H, tilt: -3 },
+  { id: 'activities',label: 'activities',          modal: 'activity',   pos: { x: 0.78, y: 0.11 }, drift: 'drift6', period: '6.3s', delay: '0.2s', depth: 0.60, src: '/svgs/travel.svg',                    w: W, h: 257, tilt:  2 },
+  { id: 'journal',   label: 'journal',             modal: 'journal',    pos: { x: 0.87, y: 0.28 }, drift: 'drift3', period: '7.2s', delay: '0.4s', depth: 0.55, src: '/svgs/typewriter.svg',                w: W, h: 232, tilt:  3, offsetX: -30 },
+  { id: 'random',    label: 'thoughts',            modal: 'typewriter', pos: { x: 0.87, y: 0.52 }, drift: 'drift2', period: '6.1s', delay: '0.5s', depth: 0.50, src: '/svgs/typing.svg',                    w: W, h: 239, tilt: -2, offsetX: -25 },
+  { id: 'sendNote',  label: 'note',                modal: 'letter',     pos: { x: 0.87, y: 0.76 }, drift: 'drift4', period: '6.9s', delay: '0.8s', depth: 0.65, src: '/svgs/duck%20letter.svg',             w: W, h: H,   tilt:  4, offsetX: -20 },
 ];
 
-const MAX_PX       = 20;
-const MAGNET_RANGE = 125;
-const MAGNET_MAX   = 12;
+const MAX_PX = 20;
 
 export default function Floaties({ onOpen, verticalOffset = 0 }: FloatiesProps) {
   const [visible, setVisible] = useState(false);
-  const [ripples, setRipples] = useState<Record<string, boolean>>({});
   const [vw, setVw] = useState(() => window.innerWidth);
+  const [ripples, setRipples] = useState<Record<string, boolean>>({});
+  const [mobileIds] = useState(() => {
+    const shuffled = [...FLOATIES].sort(() => Math.random() - 0.5);
+    return new Set(shuffled.slice(0, 4).map(item => item.id));
+  });
 
-  useEffect(() => {
-    const onResize = () => setVw(window.innerWidth);
-    window.addEventListener('resize', onResize);
-    return () => window.removeEventListener('resize', onResize);
-  }, []);
-
-  const rawMouse    = useRef({ x: 0, y: 0 });
-  const smoothMouse = useRef({ x: 0, y: 0 });
-  const cursorPx    = useRef({ x: -9999, y: -9999 });
-  const pxRefs      = useRef<(HTMLDivElement | null)[]>([]);
-  const rafRef      = useRef<number>(0);
-
-  useEffect(() => {
-    const t = setTimeout(() => setVisible(true), 400);
-    return () => clearTimeout(t);
-  }, []);
-
-  const onMouseMove = useCallback((e: MouseEvent) => {
-    rawMouse.current = {
-      x: (e.clientX / window.innerWidth  - 0.5) * 2,
-      y: (e.clientY / window.innerHeight - 0.5) * 2,
-    };
-    cursorPx.current = { x: e.clientX, y: e.clientY };
-  }, []);
-
-  useEffect(() => {
-    const loop = () => {
-      const LERP = 0.07;
-      smoothMouse.current.x += (rawMouse.current.x - smoothMouse.current.x) * LERP;
-      smoothMouse.current.y += (rawMouse.current.y - smoothMouse.current.y) * LERP;
-
-      const W = window.innerWidth;
-      const H = window.innerHeight;
-
-      FLOATIES.forEach((f, i) => {
-        const el = pxRefs.current[i];
-        if (!el) return;
-
-        let tx = -smoothMouse.current.x * MAX_PX * f.depth;
-        let ty = -smoothMouse.current.y * MAX_PX * f.depth;
-
-        // Use the offset-adjusted Y for magnet distance calculation
-        const floatX = f.pos.x * W;
-        const floatY = f.pos.y * H + verticalOffset;
-        const dx = cursorPx.current.x - floatX;
-        const dy = cursorPx.current.y - floatY;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        if (dist < MAGNET_RANGE && dist > 1) {
-          const pull = (1 - dist / MAGNET_RANGE) ** 2;
-          tx += (dx / dist) * pull * MAGNET_MAX;
-          ty += (dy / dist) * pull * MAGNET_MAX;
-        }
-
-        const ox = f.offsetX || 0;
-        el.style.transform = `translate(${(tx + ox).toFixed(2)}px, ${ty.toFixed(2)}px)`;
-      });
-
-      rafRef.current = requestAnimationFrame(loop);
-    };
-    rafRef.current = requestAnimationFrame(loop);
-    window.addEventListener('mousemove', onMouseMove, { passive: true });
-    return () => {
-      cancelAnimationFrame(rafRef.current);
-      window.removeEventListener('mousemove', onMouseMove);
-    };
-  }, [onMouseMove, verticalOffset]);
+  const mouse = useRef({ x: 0, y: 0 });
+  const refs  = useRef<(HTMLDivElement | null)[]>([]);
+  const raf   = useRef(0);
 
   const handleClick = useCallback((f: Floatie) => {
     setRipples(r => ({ ...r, [f.id]: true }));
-    setTimeout(() => setRipples(r => { const n = { ...r }; delete n[f.id]; return n; }), 600);
+    setTimeout(() => {
+      setRipples(r => { const copy = { ...r }; delete copy[f.id]; return copy; });
+    }, 600);
     onOpen(f.modal);
   }, [onOpen]);
 
-  return (
+  useEffect(() => {
+    const resize = () => setVw(window.innerWidth);
+    window.addEventListener('resize', resize);
+    return () => window.removeEventListener('resize', resize);
+  }, []);
+
+  useEffect(() => { setTimeout(() => setVisible(true), 300); }, []);
+
+  useEffect(() => {
+    const move = (e: MouseEvent) => {
+      mouse.current = {
+        x: (e.clientX / window.innerWidth  - 0.5) * 2,
+        y: (e.clientY / window.innerHeight - 0.5) * 2,
+      };
+    };
+    const loop = () => {
+      FLOATIES.forEach((f, i) => {
+        const el = refs.current[i];
+        if (!el) return;
+        const tx = -mouse.current.x * MAX_PX * f.depth + (f.offsetX || 0);
+        const ty = -mouse.current.y * MAX_PX * f.depth;
+        el.style.transform = `translate(${tx}px, ${ty}px)`;
+      });
+      raf.current = requestAnimationFrame(loop);
+    };
+    raf.current = requestAnimationFrame(loop);
+    window.addEventListener('mousemove', move);
+    return () => { cancelAnimationFrame(raf.current); window.removeEventListener('mousemove', move); };
+  }, []);
+
+  return createPortal(
     <>
       <style>{`
-        .floatie-anchor {
-          position: fixed;
-          transform: translate(-50%, -50%);
-          pointer-events: none;
-          z-index: 20;
+        @keyframes floatieRipple {
+          0%   { transform: translate(-50%,-50%) scale(0); opacity: 0.5; }
+          100% { transform: translate(-50%,-50%) scale(2.5); opacity: 0; }
         }
-        .floatie-px {
-          position: relative;
-          display: inline-block;
-          pointer-events: auto;
-          cursor: pointer;
-          will-change: transform;
-        }
-        .floatie-pop {
-          display: inline-block;
-          opacity: 0;
-        }
-        .floatie-pop.entered {
-          animation: popIn 0.72s cubic-bezier(.34,1.56,.64,1) both;
-        }
-
-        .floatie-px:hover .floatie-inner img {
-          transform: scale(1.10) rotate(-2deg) translateY(-4px) !important;
-        }
-        .floatie-inner img {
-          transition: transform 0.42s cubic-bezier(.34,1.56,.64,1);
-          display: block;
-
-        }
-
-        .floatie-px:active .floatie-inner img {
-          transform: scale(0.92) rotate(2deg) translateY(2px) !important;
-          transition: transform 0.08s ease !important;
-        }
-
-        .ftag {
-          position: absolute;
-          left: 50%;
-          white-space: nowrap;
-          font-size: 9px;
-          font-family: 'DM Mono', monospace;
-          letter-spacing: 0.08em;
-          color: rgba(42,28,16,0.80);
-          background: rgba(252,248,242,0.97);
-          border: 1px solid rgba(232,84,58,0.18);
-          border-left: 2.5px solid rgba(232,84,58,0.55);
-          border-radius: 4px;
-          padding: 4px 10px 4px 8px;
-          pointer-events: none;
-          box-shadow: 0 2px 8px rgba(40,24,12,0.10);
-          backdrop-filter: blur(4px);
-          transition: opacity 0.2s ease, transform 0.22s cubic-bezier(.34,1.56,.64,1);
-          /* all tiers hidden by default */
-          opacity: 0;
-          transform: translateX(-50%) translateY(8px) rotate(-1deg);
-        }
-        .floatie-px:hover .ftag {
-          opacity: 1;
-          transform: translateX(-50%) translateY(2px) rotate(0deg);
-        }
-
         .floatie-ripple {
-          position: absolute;
-          top: 50%; left: 50%;
-          width: 88px; height: 88px;
-          margin: -44px 0 0 -44px;
-          border-radius: 50%;
-          background: rgba(232,84,58,0.20);
-          pointer-events: none;
-          z-index: 1;
-          animation: ripple 0.65s ease-out forwards;
+          position: absolute; top: 50%; left: 50%;
+          width: 80px; height: 80px; border-radius: 50%;
+          background: rgba(232,84,58,0.18);
+          pointer-events: none; z-index: 1;
+          animation: floatieRipple 0.6s ease-out forwards;
         }
-
-        .floatie-ring { display: none; }
       `}</style>
 
       {FLOATIES.map((f, i) => {
-        const t = TIER[f.tier];
         const isMobile = vw < 768;
+        if (isMobile && !mobileIds.has(f.id)) return null;
+        const scale    = 0.90;
+        const w        = Math.round(f.w * scale);
+        const h        = Math.round(f.h * scale);
 
-        // On mobile, right-side floaties render 1.5x bigger so they match
-        // the visual weight of the left-side full-body characters.
-        const sizeBoost = (isMobile && f.pos.x > 0.5) ? 1.5 : 1;
-        const scaledW = Math.round(f.w * t.scale * sizeBoost);
-        const scaledH = Math.round(f.h * t.scale * sizeBoost);
-
-        const topValue = `calc(${f.pos.y * 100}% + ${verticalOffset}px)`;
-        const leftValue = `${f.pos.x * 100}%`;
+        // ── Horizontal position ──────────────────────────────────────────────
+        // Desktop: use exact % positions from FLOATIES data
+        // Mobile: left column peeks off left edge (~6%), right column peeks
+        //         off right edge (~88–92%) so they're symmetric and not
+        //         overlapping the globe in the centre.
+        let left = `${f.pos.x * 100}%`;
+        if (isMobile) {
+          // Left column — hug left edge
+          if (f.id === 'advice' || f.id === 'snap'    || f.id === 'movies') left = '6%';
+          // Top row — slight inward pull so visible
+          if (f.id === 'food')        left = '20%';
+          if (f.id === 'activities')  left = '80%';
+          // Right column — push to right edge, peeking off symmetrically with left
+          if (f.id === 'journal')     left = '94%';
+          if (f.id === 'random')      left = '96%';
+          if (f.id === 'sendNote')    left = '94%';
+        }
 
         return (
           <div
             key={f.id}
-            className="floatie-anchor"
             style={{
-              left: leftValue,
-              top: topValue,
+              position: 'fixed',
+              left,
+              top: `calc(${f.pos.y * 100}% + ${verticalOffset}px)`,
+              width: w,
+              transform: 'translate(-50%, -50%)',
+              opacity: visible ? 1 : 0,
+              transition: 'opacity 0.5s ease',
+              zIndex: 20,
+              pointerEvents: 'none',
             }}
           >
             <div
-              ref={el => { pxRefs.current[i] = el; }}
-              className="floatie-px"
-              style={{ filter: t.shadow, opacity: t.opacity }}
+              ref={el => { refs.current[i] = el; }}
               onClick={() => handleClick(f)}
+              style={{
+                cursor: 'pointer',
+                pointerEvents: 'auto',
+                position: 'relative',
+                filter: 'drop-shadow(0 4px 12px rgba(40,28,18,0.10))',
+              }}
             >
               {ripples[f.id] && <div className="floatie-ripple" />}
-              {f.tier === 1 && <div className="floatie-ring" />}
-
-              <div
-                className={`floatie-pop${visible ? ' entered' : ''}`}
-                style={{ animationDelay: `${i * 0.09}s` }}
-              >
-                <div
-                  className="floatie-inner"
-                  style={{
-                    display: 'inline-block',
-                    transform: `rotate(${f.tilt}deg)`,
-                    animation: visible
-                      ? `${f.drift} ${f.period} ease-in-out ${f.delay} infinite`
-                      : 'none',
-                  }}
-                >
-                  <img
-                    src={f.src}
-                    width={scaledW}
-                    height={scaledH}
-                    style={{
-                      width: scaledW,
-                      height: scaledH,
-                      filter: t.blur !== 'none' ? t.blur : undefined,
-                    }}
-                    alt={f.label}
-                    draggable={false}
-                    loading="eager"
-                  />
-                </div>
-
-                <div
-                  className={`ftag ftag-t${f.tier}`}
-                  style={{ top: scaledH + 7 }}
-                >
-                  {f.label}
-                </div>
-              </div>
+              <img
+                src={f.src}
+                width={w}
+                height={h}
+                style={{
+                  display: 'block',
+                  userSelect: 'none',
+                }}
+                alt={f.label}
+                draggable={false}
+              />
             </div>
           </div>
         );
       })}
-    </>
+    </>,
+    document.body
   );
 }

@@ -311,7 +311,7 @@ export default function SharedJournal() {
   const [flipAnim, setFlipAnim] = useState<'idle' | 'fwd' | 'back'>('idle');
 
   useEffect(() => {
-    getJournalEntries().then(setEntries).finally(() => setLoading(false));
+    getJournalEntries().then(setEntries).catch(() => setEntries([])).finally(() => setLoading(false));
   }, []);
 
   const handleAdded = (entry: JournalEntry) => {

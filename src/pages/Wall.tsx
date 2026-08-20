@@ -1,36 +1,10 @@
-import { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import SharedNav from '../components/Nav/SharedNav';
 import WhisperWall from '../components/feed/WhisperWall';
-import ComposeModal from '../components/modals/ComposeModal';
-import LetterModal from '../components/modals/LetterModal';
-import PolaroidModal from '../components/modals/PolaroidModal';
-import TypewriterModal from '../components/modals/TypewriterModal';
-import CafeModal from '../components/modals/CafeModal';
-import JournalModal from '../components/modals/JournalModal';
-import ActivityModal from '../components/modals/ActivityModal';
-import AdviceModal from '../components/modals/AdviceModal';
+import ComposeStack from '../components/modals/ComposeStack';
 import { useModal } from '../hooks/useModal';
-
-function burstConfetti(originEl: HTMLElement) {
-  const rect = originEl.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2, cy = rect.top + rect.height / 2;
-  const COLORS = ['#E8543A','#EDB846','#5D9A70','#7090C8','#F5A08A','#F5D080','#90C4A0'];
-  for (let i = 0; i < 22; i++) {
-    const el = document.createElement('div');
-    const sq = Math.random() > 0.5, sz = 5 + Math.random() * 7;
-    el.style.cssText = ['position:fixed','pointer-events:none','z-index:9998',`left:${cx}px`,`top:${cy}px`,`width:${sz}px`,`height:${sq?sz:sz*0.45}px`,`background:${COLORS[Math.floor(Math.random()*COLORS.length)]}`,`border-radius:${sq?'2px':'50%'}`,'transform-origin:center'].join(';');
-    document.body.appendChild(el);
-    const angle = (Math.PI*2*i/22)+(Math.random()-0.5)*0.5, spd = 4+Math.random()*7;
-    let vx=Math.cos(angle)*spd, vy=Math.sin(angle)*spd-4, x=cx, y=cy, rot=Math.random()*360, life=1;
-    const rs=(Math.random()-0.5)*20;
-    const tick=()=>{ life-=0.024; if(life<=0){el.remove();return;} vy+=0.3;vx*=0.97;x+=vx;y+=vy;rot+=rs; el.style.left=`${x-sz/2}px`;el.style.top=`${y-sz/2}px`;el.style.opacity=String(life);el.style.transform=`rotate(${rot}deg) scale(${life})`;requestAnimationFrame(tick); };
-    setTimeout(()=>requestAnimationFrame(tick), i*12);
-  }
-}
 
 export default function Wall() {
   const { activeModal, openModal, closeModal } = useModal();
-  const navBtnRef = useRef<HTMLButtonElement>(null);
 
   return (
     <div style={{ background: 'var(--bg-wall)', minHeight: '100vh' }}>
@@ -80,33 +54,13 @@ export default function Wall() {
         <path d="M 1418 878 L 1394 878 M 1418 878 L 1418 854" fill="none" stroke="rgba(200,84,58,0.14)" strokeWidth="1.3" strokeLinecap="round"/>
       </svg>
 
-      <nav style={{position:'fixed',top:0,left:0,right:0,zIndex:30,display:'flex',justifyContent:'space-between',alignItems:'center',padding:'20px 32px'}}>
-        <Link to="/" style={{fontFamily:'"Playfair Display",serif',fontStyle:'italic',fontSize:'14px',color:'#0F0D0B',letterSpacing:'-0.01em',opacity:0.45,textDecoration:'none'}}>
-          b<span style={{color:'#E8543A'}}>.</span>b<span style={{color:'#EDB846'}}>.</span>b
-        </Link>
-        <div style={{display:'flex',gap:'20px',alignItems:'center'}}>
-          <Link to="/wall"    className="wall-nav-link active">wall</Link>
-          <Link to="/journal" className="wall-nav-link">journal</Link>
-          <button ref={navBtnRef} className="wall-cta" onClick={e=>{burstConfetti(e.currentTarget);openModal('compose');}}>
-            <span className="liq"/>
-            <span style={{position:'relative',zIndex:1}}>+ leave a whisper</span>
-          </button>
-        </div>
-      </nav>
+      <SharedNav onCompose={() => openModal('compose')} />
 
       <div style={{paddingTop:'64px',position:'relative',zIndex:1}}>
         <WhisperWall />
       </div>
 
-      <ComposeModal isOpen={activeModal==='compose'} onClose={closeModal} onSelectType={openModal}/>
-      <LetterModal  isOpen={activeModal==='letter'}  onClose={closeModal}/>
-      <PolaroidModal  isOpen={activeModal==='polaroid'}   onClose={closeModal}/>
-      <TypewriterModal isOpen={activeModal==='typewriter'} onClose={closeModal}/>
-      <CafeModal    isOpen={activeModal==='cafe'}    onClose={closeModal}/>
-      <JournalModal isOpen={activeModal==='journal'} onClose={closeModal}/>
-      <ActivityModal  isOpen={activeModal==='activity'}   onClose={closeModal} lockedMode="doing" />
-      <ActivityModal  isOpen={activeModal==='movie'}      onClose={closeModal} lockedMode="movie" />
-      <AdviceModal    isOpen={activeModal==='advice'}     onClose={closeModal} />
+      <ComposeStack activeModal={activeModal} openModal={openModal} closeModal={closeModal} />
     </div>
   );
 }
